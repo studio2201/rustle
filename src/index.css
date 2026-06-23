@@ -386,3 +386,141 @@ svg.cursor-pointer:hover {
   border-color: #15381a !important;
 }
 
+/* Hard Mode Fiery Theme */
+.hard-mode {
+  color-scheme: dark;
+}
+
+.hard-mode body,
+.hard-mode .bg-white,
+.hard-mode .dark\:bg-slate-900,
+.hard-mode .bg-slate-900,
+.hard-mode .bg-white.dark\:bg-slate-900 {
+  background: radial-gradient(circle at bottom, #2c0802 0%, #0d0200 70%, #000000 100%) !important;
+  background-color: #0d0200 !important;
+  color: #ffaa00 !important;
+  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+}
+
+/* Fiery Title */
+.hard-mode .navbar-content p {
+  color: #ff3300 !important;
+  text-shadow: 0 0 4px #ff3300, 0 -2px 10px #ffaa00, 0 -8px 20px #ff5500, 0 -15px 30px #ff0000 !important;
+  animation: fire-flicker 1.5s infinite alternate !important;
+}
+
+@keyframes fire-flicker {
+  0% {
+    text-shadow: 0 0 4px #ff3300, 0 -2px 4px #ffaa00, 0 -6px 12px #ff5500, 0 -12px 24px #ff0000;
+  }
+  50% {
+    text-shadow: 0 0 5px #ff5500, 0 -3px 6px #ffcc00, 0 -8px 16px #ff7700, 0 -15px 30px #ff1100;
+  }
+  100% {
+    text-shadow: 0 0 3px #ff1100, 0 -1px 3px #ff8800, 0 -5px 10px #ff3300, 0 -10px 20px #d40000;
+  }
+}
+
+/* Text and general styles */
+.hard-mode p,
+.hard-mode h1,
+.hard-mode h2,
+.hard-mode h3,
+.hard-mode span,
+.hard-mode button,
+.hard-mode div {
+  color: #ffaa00 !important;
+}
+
+.hard-mode svg {
+  stroke: #ffaa00 !important;
+}
+
+/* Grid cells override */
+.hard-mode .border-slate-200,
+.hard-mode .dark\:border-slate-600,
+.hard-mode .border-black,
+.hard-mode .dark\:border-slate-100 {
+  border-color: #5a1100 !important;
+  background-color: #1a0300 !important;
+}
+
+/* Cell/Key states */
+/* Correct: glowing orange border, white-hot center */
+.hard-mode .correct,
+.hard-mode .bg-green-500,
+.hard-mode .bg-orange-500 {
+  background-color: #ff5500 !important;
+  border-color: #ffdd00 !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 12px #ff5500, inset 0 0 6px #ffffff !important;
+  animation: coal-glow-correct 2s infinite alternate !important;
+}
+
+/* Present: warm orange glow */
+.hard-mode .present,
+.hard-mode .bg-yellow-500,
+.hard-mode .bg-cyan-500 {
+  background-color: #b33600 !important;
+  border-color: #ff7700 !important;
+  color: #ffeedd !important;
+  box-shadow: 0 0 8px #ff7700 !important;
+  animation: coal-glow-present 2.5s infinite alternate !important;
+}
+
+/* Absent: charcoal grey */
+.hard-mode .absent,
+.hard-mode .bg-slate-400,
+.hard-mode .dark\:bg-slate-800,
+.hard-mode .bg-slate-800 {
+  background-color: #151515 !important;
+  border-color: #222222 !important;
+  color: #555555 !important;
+}
+
+/* Unused/default keys */
+.hard-mode .bg-slate-200,
+.hard-mode .dark\:bg-slate-600 {
+  background-color: #1f0804 !important;
+  border: 1px solid #4a1307 !important;
+  color: #ffaa00 !important;
+}
+
+.hard-mode .hover\:bg-slate-300:hover,
+.hard-mode .dark\:hover\:bg-slate-600:hover {
+  background-color: #380e06 !important;
+}
+
+@keyframes coal-glow-correct {
+  0% {
+    box-shadow: 0 0 8px #ff5500, inset 0 0 4px #ffffff;
+    border-color: #ffaa00;
+  }
+  100% {
+    box-shadow: 0 0 16px #ff7700, inset 0 0 8px #ffffff;
+    border-color: #ffff33;
+  }
+}
+
+@keyframes coal-glow-present {
+  0% {
+    box-shadow: 0 0 6px #ff3300;
+    border-color: #ff5500;
+  }
+  100% {
+    box-shadow: 0 0 12px #ff8800;
+    border-color: #ffaa00;
+  }
+}
+
+/* Dialogs / Modals */
+.hard-mode .bg-white,
+.hard-mode .dark\:bg-slate-900 {
+  border: 2px solid #ff5500 !important;
+  box-shadow: 0 0 25px rgba(255, 85, 0, 0.5) !important;
+}
+
+.hard-mode .divide-y > * + * {
+  border-color: #5a1100 !important;
+}
+
