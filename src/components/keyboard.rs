@@ -15,9 +15,13 @@
 // You should have received a copy of the GNU General Public License
 // along with Rustle.  If not, see <https://www.gnu.org/licenses/>.
 
-use crate::constants::config::REVEAL_TIME_MS;
-use crate::helpers::local_storage::get_stored_is_high_contrast_mode;
-use crate::helpers::statuses::{get_statuses, CharStatus};
+use crate::{
+    constants::config::REVEAL_TIME_MS,
+    helpers::{
+        local_storage::get_stored_is_high_contrast_mode,
+        statuses::{get_statuses, CharStatus},
+    },
+};
 use wasm_bindgen::JsCast;
 use yew::prelude::*;
 
@@ -44,25 +48,36 @@ pub fn key_btn(props: &KeyProps) -> Html {
     let is_high_contrast = get_stored_is_high_contrast_mode();
     let status = props.status;
 
-    let is_special = value == "ENTER" || value == "DELETE";
-    let text_size_class = if is_special {
+    let text_size_class = if value == "ENTER" || value == "DELETE" {
         "text-[10px] sm:text-xs px-0.5"
     } else {
         "text-sm sm:text-base"
     };
 
-    let key_classes = classes!(
-        "xxshort:h-9",
-        "xshort:h-11",
-        "short:h-12",
-        "h-14",
-        "sm:h-16",
+    let bg_class = match (status, is_high_contrast) {
+        (None, _) => "bg-slate-200 dark:bg-slate-600 hover:bg-slate-300 active:bg-slate-400",
+        (Some(CharStatus::Absent), _) => "bg-slate-400 dark:bg-slate-800 text-white",
+        (Some(CharStatus::Correct), true) => {
+            "bg-orange-500 hover:bg-orange-600 active:bg-orange-700 text-white"
+        }
+        (Some(CharStatus::Present), true) => {
+            "bg-cyan-500 hover:bg-cyan-600 active:bg-cyan-700 text-white"
+        }
+        (Some(CharStatus::Correct), false) => {
+            "bg-green-500 hover:bg-green-600 active:bg-green-700 text-white"
+        }
+        (Some(CharStatus::Present), false) => {
+            "bg-yellow-500 hover:bg-yellow-600 active:bg-yellow-700 text-white"
+        }
+    };
+
+    let mut key_classes = classes!(
+        "h-full",
         "flex",
         "items-center",
         "justify-center",
         "rounded",
         "mx-0.5",
-        text_size_class,
         "font-bold",
         "cursor-pointer",
         "select-none",
@@ -70,43 +85,16 @@ pub fn key_btn(props: &KeyProps) -> Html {
         "dark:text-white",
         "shadow-sm",
         "active:scale-95",
-        "transition-transform",
-        if props.is_revealing {
-            "transition ease-in-out"
-        } else {
-            ""
-        },
-        if status.is_none() {
-            "bg-slate-200 dark:bg-slate-600 hover:bg-slate-300 active:bg-slate-400"
-        } else {
-            ""
-        },
-        if status == Some(CharStatus::Absent) {
-            "bg-slate-400 dark:bg-slate-800 text-white"
-        } else {
-            ""
-        },
-        if status == Some(CharStatus::Correct) && is_high_contrast {
-            "bg-orange-500 hover:bg-orange-600 active:bg-orange-700 text-white"
-        } else {
-            ""
-        },
-        if status == Some(CharStatus::Present) && is_high_contrast {
-            "bg-cyan-500 hover:bg-cyan-600 active:bg-cyan-700 text-white"
-        } else {
-            ""
-        },
-        if status == Some(CharStatus::Correct) && !is_high_contrast {
-            "bg-green-500 hover:bg-green-600 active:bg-green-700 text-white"
-        } else {
-            ""
-        },
-        if status == Some(CharStatus::Present) && !is_high_contrast {
-            "bg-yellow-500 hover:bg-yellow-600 active:bg-yellow-700 text-white"
-        } else {
-            ""
-        }
+        "transition-transform"
     );
+
+    key_classes.push(text_size_class.split_whitespace().collect::<Vec<_>>());
+    key_classes.push(bg_class.split_whitespace().collect::<Vec<_>>());
+
+    if props.is_revealing {
+        key_classes.push("transition");
+        key_classes.push("ease-in-out");
+    }
 
     let transition_delay = if props.is_revealing {
         format!("transition-delay: {}ms;", key_delay_ms)
@@ -171,14 +159,9 @@ pub fn keyboard(props: &KeyboardProps) -> Html {
                             on_enter.emit(());
                         } else if code == "Backspace" {
                             on_delete.emit(());
-                        } else {
-                            let key = ke.key();
-                            if key.len() == 1 {
-                                if let Some(c) = key.chars().next() {
-                                    if c.is_ascii_alphabetic() {
-                                        on_char.emit(c.to_ascii_uppercase());
-                                    }
-                                }
+                        } else if let Some(c) = ke.key().chars().next() {
+                            if ke.key().len() == 1 && c.is_ascii_alphabetic() {
+                                on_char.emit(c.to_ascii_uppercase());
                             }
                         }
                     }
@@ -200,10 +183,8 @@ pub fn keyboard(props: &KeyboardProps) -> Html {
                 on_enter.emit(());
             } else if value == "DELETE" {
                 on_delete.emit(());
-            } else {
-                if let Some(c) = value.chars().next() {
-                    on_char.emit(c);
-                }
+            } else if let Some(c) = value.chars().next() {
+                on_char.emit(c);
             }
         })
     };
@@ -212,76 +193,43 @@ pub fn keyboard(props: &KeyboardProps) -> Html {
     let row2 = ["A", "S", "D", "F", "G", "H", "J", "K", "L"];
     let row3 = ["Z", "X", "C", "V", "B", "N", "M"];
 
+    let render_key = {
+        let click_key = click_key.clone();
+        let is_revealing = props.is_revealing;
+        let char_statuses = char_statuses.clone();
+        move |key: &str| {
+            let c = key.chars().next().unwrap_or('\0');
+            let status = char_statuses.get(&c).copied();
+            html! {
+                <Key value={key.to_string()} status={status} on_click={click_key.clone()} is_revealing={is_revealing} solution_len={solution_len}>
+                    {key}
+                </Key>
+            }
+        }
+    };
+
+    let render_row = |keys: &[&str]| keys.iter().map(|&key| render_key(key)).collect::<Html>();
+
     html! {
-        <div class="keyboard-container mx-auto w-full max-w-[520px] px-1 select-none">
-            <div class="mb-1 flex justify-center w-full">
-                {for row1.into_iter().map(|key| {
-                    let c = key.chars().next().unwrap_or('\0');
-                    let status = char_statuses.get(&c).copied();
-                    html! {
-                        <Key
-                            value={key.to_string()}
-                            status={status}
-                            on_click={click_key.clone()}
-                            is_revealing={props.is_revealing}
-                            solution_len={solution_len}
-                        >
-                            {html! { {key} }}
-                        </Key>
-                    }
-                })}
+        <div class="keyboard-container mx-auto w-2/3 h-[44vh] px-1 select-none flex flex-col justify-between gap-1.5">
+            <div class="flex justify-center w-full flex-1">
+                {render_row(&row1)}
             </div>
-            <div class="mb-1 flex justify-center w-full">
+            <div class="flex justify-center w-full flex-1">
                 <div class="flex mx-0.5" style="flex: 20 1 0%; pointer-events: none;"></div>
-                {for row2.into_iter().map(|key| {
-                    let c = key.chars().next().unwrap_or('\0');
-                    let status = char_statuses.get(&c).copied();
-                    html! {
-                        <Key
-                            value={key.to_string()}
-                            status={status}
-                            on_click={click_key.clone()}
-                            is_revealing={props.is_revealing}
-                            solution_len={solution_len}
-                        >
-                            {html! { {key} }}
-                        </Key>
-                    }
-                })}
+                {render_row(&row2)}
                 <div class="flex mx-0.5" style="flex: 20 1 0%; pointer-events: none;"></div>
             </div>
-            <div class="flex justify-center w-full">
-                <Key
-                    width={60}
-                    value="ENTER"
-                    on_click={click_key.clone()}
-                    solution_len={solution_len}
-                >
-                    {html! { {crate::constants::config::ENTER_TEXT} }}
+            <div class="flex justify-center w-full flex-1">
+                <div class="flex mx-0.5" style="flex: 20 1 0%; pointer-events: none;"></div>
+                <Key width={40} value="ENTER" on_click={click_key.clone()} solution_len={solution_len}>
+                    {crate::constants::config::ENTER_TEXT}
                 </Key>
-                {for row3.into_iter().map(|key| {
-                    let c = key.chars().next().unwrap_or('\0');
-                    let status = char_statuses.get(&c).copied();
-                    html! {
-                        <Key
-                            value={key.to_string()}
-                            status={status}
-                            on_click={click_key.clone()}
-                            is_revealing={props.is_revealing}
-                            solution_len={solution_len}
-                        >
-                            {html! { {key} }}
-                        </Key>
-                    }
-                })}
-                <Key
-                    width={60}
-                    value="DELETE"
-                    on_click={click_key.clone()}
-                    solution_len={solution_len}
-                >
-                    {html! { {crate::constants::config::DELETE_TEXT} }}
+                {render_row(&row3)}
+                <Key width={40} value="DELETE" on_click={click_key.clone()} solution_len={solution_len}>
+                    {crate::constants::config::DELETE_TEXT}
                 </Key>
+                <div class="flex mx-0.5" style="flex: 20 1 0%; pointer-events: none;"></div>
             </div>
         </div>
     }
