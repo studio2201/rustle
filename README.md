@@ -1,78 +1,87 @@
-# React Wordle
+# Rustle
 
-![Docker Pulls](https://img.shields.io/docker/pulls/modem7/wordle)
-![Docker Image Size (tag)](https://img.shields.io/docker/image-size/modem7/wordle/latest)
-[![Build Status](https://drone.modem7.com/api/badges/modem7/react-wordle/status.svg)](https://drone.modem7.com/modem7/react-wordle)
-[![GitHub last commit](https://img.shields.io/github/last-commit/modem7/react-wordle)](react-wordle)
-![GitHub Workflow Status](https://img.shields.io/github/workflow/status/modem7/react-wordle/React%20app%20deployement?label=gh%20pages)
+An optimized Rust + WebAssembly (Yew) Wordle clone.
 
-This is a clone project of the popular word guessing game we all know and love. Made using React, Typescript, and Tailwind.
+## Local Development (Time-To-First-Run)
 
-Modified by [modem7](https://github.com/modem7) for github-pages. 
+### 1. Prerequisites
+Ensure you have the Rust toolchain and WASM compilation target installed:
+```bash
+# Add WebAssembly target
+rustup target add wasm32-unknown-unknown
 
-[**Try it out!**](https://modem7.github.io/react-wordle/)
-
-# Breaking changes note
-This repo has now been merged with the old Worlde repo which had the old NYT container. 
-
-The reasoning for this is to lower maintenance across multiple repos and reduce build time. 
-
-There is also a [Github pages](https://modem7.github.io/react-wordle/) version of "latest".
-
-As such, there is a new configuration: 
-
-## Latest
-This is a new version of Wordle, created by [cwackerfuss](https://github.com/cwackerfuss/react-wordle), and as such, it will not match with the latest "Word of the day". 
-
-Please see the configuration below to set this up. 
-
-## Legacy
-This is the original Worlde, cloned from the orignal website, and shunted into an Nginx container. This is as close as you'll get to the NYT version, and it should be in line with the latest word of the day. 
-
-This will not be updated, except for security updates and Nginx updates.
-
-Please see the configuration below to set this up.
-
-# Configuration
-
-## Latest
-Note: Sharing feature requires this to be hosted via https as per [#331](https://github.com/cwackerfuss/react-wordle/issues/331#issuecomment-1073155476).
-
-```yaml
-version: "2.4"
-
-services:
-
-  wordle:
-    image: modem7/wordle:latest
-    container_name: Wordle
-    ports:
-      - 80:8080
+# Install Trunk compiler
+cargo install --locked trunk
 ```
 
-## Legacy
-
-```yaml
-version: "2.4"
-
-services:
-
-  wordle:
-    image: modem7/wordle:legacy
-    container_name: Wordle
-    ports:
-      - 80:80
+### 2. Install Styles Dependencies
+```bash
+npm install
 ```
 
-# Tags
-| Tag | Description |
-| :----: | --- |
-| latest | Latest version |
-| legacy | Legacy version |
+### 3. Run Development Server
+```bash
+trunk serve
+```
+Open [http://localhost:4409](http://localhost:4409) to play.
 
-## Project Screenshot
+## Docker Container Deployment
 
-![image](https://user-images.githubusercontent.com/4349962/158677511-50faa60b-26a1-4880-a580-b433389f03aa.png)
+### 1. Build Production Image
+Build the multi-stage, optimized WASM Docker image:
+```bash
+docker build -t ubermetroid/rustle:latest -f docker/Dockerfile .
+```
 
-## Original Project
-[Cwackerfuss/React-Wordle](https://github.com/cwackerfuss/react-wordle)
+### 2. Run Container
+Launch the lightweight Nginx server hosting the WASM app under a secure, non-root user:
+```bash
+docker run -d -p 4409:4409 --name rustle-game ubermetroid/rustle:latest
+```
+Open [http://localhost:4409](http://localhost:4409) to play.
+
+## File Tree
+
+```text
+rustle/
+├── Cargo.toml                  # Cargo dependencies & release optimization profile
+├── Trunk.toml                  # WebAssembly build tool configuration
+├── index.html                  # HTML entry point injecting CSS/WASM target
+├── tailwind.config.js          # TailwindCSS config
+├── package.json                # Tailwind and build configurations
+└── src/
+    ├── main.rs                 # Bootstraps the Yew WASM client to the DOM
+    ├── app.rs                  # Main view layout coordinator
+    ├── app_state.rs            # Centralized Reducer-based game state machine
+    ├── app_effects.rs          # Yew custom hook holding game side effects
+    ├── constants.rs            # Top-level constants module registration
+    ├── index.css               # Core styling overrides (glassmorphism/colors)
+    ├── tailwind.css            # Compiled output of tailwind class definitions
+    ├── constants/
+    │   ├── config.rs           # Core settings, localized text messages, and game rules
+    │   └── word_db.rs          # Zero-allocation O(log N) binary search database
+    ├── components/
+    │   ├── mod.rs              # Exports and mounts modular UI components
+    │   ├── alerts.rs           # Toast style event alerts
+    │   ├── grid.rs             # Cell tiles container grid
+    │   ├── keyboard.rs         # Virtual key inputs listener & styling
+    │   ├── navbar.rs           # Navigation header controls
+    │   ├── stat_bar.rs         # Top status metrics indicator (Streaks/Tries)
+    │   ├── stat_histogram.rs   # Guess distributions chart horizontal bars
+    │   ├── app_modals.rs       # Base container coordinating overlay visibility & settings callbacks
+    │   ├── modal_base.rs       # Reusable backdrop and overlay layouts
+    │   ├── modal_info.rs       # Instructions & Rules modal
+    │   ├── modal_settings.rs   # Game difficulty, contrast, theme modal
+    │   ├── modal_stats.rs      # Win distributions, count-downs, and sharing trigger
+    │   ├── modal_date_picker.rs# Choose historical puzzles date picker
+    │   └── modal_migrate.rs    # Exporting/importing user profiles via encrypted code
+    └── helpers/
+        ├── mod.rs              # Mounts core helpers
+        ├── browser.rs          # Social media user agent checkers
+        ├── encryption.rs       # Blowfish cryptology encoder/decoder
+        ├── local_storage.rs    # Persistence adapters mapping structures to local web storage
+        ├── share.rs            # Clipboard string formatting
+        ├── stats.rs            # Streaks accumulation math
+        ├── statuses.rs         # Correct / Present / Absent validation engine
+        └── words.rs            # Epoch calendars, dates, and solution lookups
+```

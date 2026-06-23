@@ -1,0 +1,75 @@
+name: Rust WASM CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Install Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+          components: clippy, rustfmt
+
+      - name: Cache Cargo Dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Install Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Install NPM Dependencies (TailwindCSS)
+        run: npm ci
+
+      - name: Install Trunk
+        run: |
+          mkdir -p ~/.cargo/bin
+          if ! command -v trunk &> /dev/null; then
+            wget -qO- https://github.com/trunk-rs/trunk/releases/latest/download/trunk-x86_64-unknown-linux-gnu.tar.gz | tar -xzf- -C ~/.cargo/bin
+          fi
+
+      - name: Verify Formatting
+        run: cargo fmt -- --check
+
+      - name: Lints Check (Clippy)
+        run: cargo clippy -- -D warnings
+
+      - name: Cargo Check
+        run: cargo check
+
+      - name: Run Tests
+        run: cargo test
+
+      - name: Security Audit (Cargo Audit)
+        uses: rustsec/audit-action@v0.4.0
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Infrastructure Vulnerability Scan (Trivy)
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          ignore-unfixed: true
+          format: 'table'
+          severity: 'CRITICAL,HIGH'
+
+      - name: Build Trunk App (Production)
+        run: ~/.cargo/bin/trunk build --release
+

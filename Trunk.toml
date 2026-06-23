@@ -1,0 +1,25 @@
+[build]
+target = "index.html"
+dist = "dist"
+
+[serve]
+address = "127.0.0.1"
+port = 4409
+ws_protocol = "ws"
+
+[watch]
+# Paths to watch for hot-reloads.
+watch = ["src", "index.html", "public"]
+# Paths to ignore during recompilation.
+ignore = [".git", "target", "node_modules", "dist"]
+
+# Proxy template in case the frontend needs to query a local backend API
+# [[proxy]]
+# rewrite = "/api"
+# backend = "http://127.0.0.1:8080/api"
+
+[[hooks]]
+stage = "pre_build"
+command = "npx"
+command_arguments = ["tailwindcss", "-i", "src/index.css", "-o", "src/tailwind.css", "--minify"]
+
