@@ -94,48 +94,56 @@ pub fn app_modals(props: &AppModalsProps) -> Html {
         })
     };
 
-    let handle_dark_mode = {
+    let save_prefs = {
         let state = state.clone();
-        Callback::from(move |val| {
-            state.dispatch(Action::SetDarkMode(val));
+        move |dark: bool, contrast: bool, military: bool| {
+            state.dispatch(Action::SetDarkMode(dark));
+            state.dispatch(Action::SetHighContrast(contrast));
+            state.dispatch(Action::SetMilitaryTheme(military));
             crate::helpers::local_storage::save_preferences_to_local_storage(
                 &crate::helpers::local_storage::StoredPreferences {
-                    is_dark_mode: val,
-                    is_high_contrast: state.is_high_contrast,
+                    is_dark_mode: dark,
+                    is_high_contrast: contrast,
                     is_hard_mode: state.is_hard_mode,
-                    is_military_theme: state.is_military_theme,
+                    is_military_theme: military,
                 },
             );
+        }
+    };
+
+    let handle_dark_mode = {
+        let state = state.clone();
+        let save_prefs = save_prefs.clone();
+        Callback::from(move |val| {
+            if val {
+                save_prefs(true, false, false);
+            } else {
+                save_prefs(false, state.is_high_contrast, state.is_military_theme);
+            }
         })
     };
 
     let handle_high_contrast = {
         let state = state.clone();
+        let save_prefs = save_prefs.clone();
         Callback::from(move |val| {
-            state.dispatch(Action::SetHighContrast(val));
-            crate::helpers::local_storage::save_preferences_to_local_storage(
-                &crate::helpers::local_storage::StoredPreferences {
-                    is_dark_mode: state.is_dark_mode,
-                    is_high_contrast: val,
-                    is_hard_mode: state.is_hard_mode,
-                    is_military_theme: state.is_military_theme,
-                },
-            );
+            if val {
+                save_prefs(false, true, false);
+            } else {
+                save_prefs(state.is_dark_mode, false, state.is_military_theme);
+            }
         })
     };
 
     let handle_military_theme = {
         let state = state.clone();
+        let save_prefs = save_prefs.clone();
         Callback::from(move |val| {
-            state.dispatch(Action::SetMilitaryTheme(val));
-            crate::helpers::local_storage::save_preferences_to_local_storage(
-                &crate::helpers::local_storage::StoredPreferences {
-                    is_dark_mode: state.is_dark_mode,
-                    is_high_contrast: state.is_high_contrast,
-                    is_hard_mode: state.is_hard_mode,
-                    is_military_theme: val,
-                },
-            );
+            if val {
+                save_prefs(false, false, true);
+            } else {
+                save_prefs(state.is_dark_mode, state.is_high_contrast, false);
+            }
         })
     };
 
