@@ -27,8 +27,7 @@ mod native_server {
     #[tokio::main]
     pub async fn run() {
         // Setup directory serving with fallbacks for index.html client routing
-        let serve_dir = ServeDir::new("dist")
-            .fallback(ServeFile::new("dist/index.html"));
+        let serve_dir = ServeDir::new("dist").fallback(ServeFile::new("dist/index.html"));
 
         let app = Router::new().fallback_service(serve_dir);
 

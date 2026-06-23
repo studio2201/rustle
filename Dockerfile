@@ -4,7 +4,15 @@
 FROM rust:1.78 AS frontend_builder
 WORKDIR /app
 RUN rustup target add wasm32-unknown-unknown
-RUN cargo install --locked trunk
+
+# Download and install precompiled Trunk
+RUN curl -sL https://github.com/trunk-rs/trunk/releases/latest/download/trunk-x86_64-unknown-linux-gnu.tar.gz | tar -xzf- -C /usr/local/bin
+
+# Install standalone tailwindcss CLI
+RUN curl -sLO https://github.com/tailwindlabs/tailwindcss/releases/download/v3.4.17/tailwindcss-linux-x64 && \
+    chmod +x tailwindcss-linux-x64 && \
+    mv tailwindcss-linux-x64 /usr/local/bin/tailwindcss
+
 COPY . .
 RUN trunk build --release
 

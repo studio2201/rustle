@@ -39,7 +39,6 @@ fn test_guess_statuses_correct_and_present() {
     assert_eq!(statuses[4], CharStatus::Present);
 }
 
-
 #[test]
 fn test_guess_statuses_exact_match() {
     let statuses = get_guess_statuses("APPLE", "APPLE");
@@ -92,7 +91,6 @@ fn test_hard_mode_guess_validation() {
     assert!(unused.is_some());
     assert!(unused.unwrap().contains('R'));
 }
-
 
 #[test]
 fn test_persistence_game_state_and_preferences() {

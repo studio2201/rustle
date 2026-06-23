@@ -57,7 +57,7 @@ jobs:
         run: cargo test
 
       - name: Security Audit (Cargo Audit)
-        uses: rustsec/audit-action@v0.4.0
+        uses: actions-rust-lang/audit@v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
