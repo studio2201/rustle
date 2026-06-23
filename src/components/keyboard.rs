@@ -151,25 +151,31 @@ pub fn keyboard(props: &KeyboardProps) -> Html {
         let on_delete = on_delete.clone();
         let on_enter = on_enter.clone();
 
-        use_effect_with((), move |_| {
-            let listener =
-                gloo_events::EventListener::new(&gloo_utils::window(), "keyup", move |e| {
-                    if let Some(ke) = e.dyn_ref::<web_sys::KeyboardEvent>() {
-                        let code = ke.code();
-                        if code == "Enter" {
-                            on_enter.emit(());
-                        } else if code == "Backspace" {
-                            on_delete.emit(());
-                        } else if let Some(c) = ke.key().chars().next() {
-                            if ke.key().len() == 1 && c.is_ascii_alphabetic() {
-                                on_char.emit(c.to_ascii_uppercase());
+        use_effect_with(
+            (on_char, on_delete, on_enter),
+            move |(on_char, on_delete, on_enter)| {
+                let on_char = on_char.clone();
+                let on_delete = on_delete.clone();
+                let on_enter = on_enter.clone();
+                let listener =
+                    gloo_events::EventListener::new(&gloo_utils::window(), "keyup", move |e| {
+                        if let Some(ke) = e.dyn_ref::<web_sys::KeyboardEvent>() {
+                            let code = ke.code();
+                            if code == "Enter" {
+                                on_enter.emit(());
+                            } else if code == "Backspace" {
+                                on_delete.emit(());
+                            } else if let Some(c) = ke.key().chars().next() {
+                                if ke.key().len() == 1 && c.is_ascii_alphabetic() {
+                                    on_char.emit(c.to_ascii_uppercase());
+                                }
                             }
                         }
-                    }
-                });
+                    });
 
-            move || drop(listener)
-        });
+                move || drop(listener)
+            },
+        );
     }
 
     let char_statuses = get_statuses(&solution, &guesses);
