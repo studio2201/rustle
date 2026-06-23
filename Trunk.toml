@@ -11,7 +11,7 @@ ws_protocol = "ws"
 # Paths to watch for hot-reloads.
 watch = ["src", "index.html", "public"]
 # Paths to ignore during recompilation.
-ignore = [".git", "target", "node_modules", "dist"]
+ignore = [".git", "target", "dist"]
 
 # Proxy template in case the frontend needs to query a local backend API
 # [[proxy]]

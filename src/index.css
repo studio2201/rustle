@@ -197,7 +197,7 @@ svg.cursor-pointer:hover {
 }
 
 .react-datepicker__input-container input {
-  @apply form-input block w-full rounded border border-gray-300 bg-white text-base shadow-sm md:text-sm;
+  @apply block w-full rounded border border-gray-300 bg-white px-3 py-2 text-base shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 md:text-sm;
 }
 
 .react-datepicker-popper {

@@ -30,8 +30,6 @@ pub struct KeyProps {
     #[prop_or_default]
     pub children: Html,
     pub value: String,
-    #[prop_or(40)]
-    pub width: u32,
     #[prop_or_default]
     pub status: Option<CharStatus>,
     pub on_click: Callback<String>,
@@ -72,7 +70,6 @@ pub fn key_btn(props: &KeyProps) -> Html {
     };
 
     let mut key_classes = classes!(
-        "h-full",
         "flex",
         "items-center",
         "justify-center",
@@ -85,7 +82,13 @@ pub fn key_btn(props: &KeyProps) -> Html {
         "dark:text-white",
         "shadow-sm",
         "active:scale-95",
-        "transition-transform"
+        "transition-transform",
+        "xxshort:w-11",
+        "xxshort:h-11",
+        "short:w-12",
+        "short:h-12",
+        "w-14",
+        "h-14"
     );
 
     key_classes.push(text_size_class.split_whitespace().collect::<Vec<_>>());
@@ -96,13 +99,11 @@ pub fn key_btn(props: &KeyProps) -> Html {
         key_classes.push("ease-in-out");
     }
 
-    let transition_delay = if props.is_revealing {
+    let style = if props.is_revealing {
         format!("transition-delay: {}ms;", key_delay_ms)
     } else {
-        "unset".to_string()
+        "".to_string()
     };
-    let flex_style = format!("flex: {} 1 0%; min-width: 0;", props.width);
-    let styles = format!("{} {}", transition_delay, flex_style);
 
     let val = value.clone();
     let click_handler = Callback::from(move |e: MouseEvent| {
@@ -116,7 +117,7 @@ pub fn key_btn(props: &KeyProps) -> Html {
 
     html! {
         <button
-            style={styles}
+            style={style}
             aria-label={format!("{}{}", value, status.map(|s| format!(" {:?}", s)).unwrap_or_default())}
             class={key_classes}
             onclick={click_handler}
@@ -211,25 +212,21 @@ pub fn keyboard(props: &KeyboardProps) -> Html {
     let render_row = |keys: &[&str]| keys.iter().map(|&key| render_key(key)).collect::<Html>();
 
     html! {
-        <div class="keyboard-container mx-auto w-2/3 h-[44vh] px-1 select-none flex flex-col justify-between gap-1.5">
-            <div class="flex justify-center w-full flex-1">
+        <div class="keyboard-container mx-auto select-none pb-2">
+            <div class="flex justify-center w-full mb-1">
                 {render_row(&row1)}
             </div>
-            <div class="flex justify-center w-full flex-1">
-                <div class="flex mx-0.5" style="flex: 20 1 0%; pointer-events: none;"></div>
+            <div class="flex justify-center w-full mb-1">
                 {render_row(&row2)}
-                <div class="flex mx-0.5" style="flex: 20 1 0%; pointer-events: none;"></div>
             </div>
-            <div class="flex justify-center w-full flex-1">
-                <div class="flex mx-0.5" style="flex: 20 1 0%; pointer-events: none;"></div>
-                <Key width={40} value="ENTER" on_click={click_key.clone()} solution_len={solution_len}>
+            <div class="flex justify-center w-full mb-1">
+                <Key value="ENTER" on_click={click_key.clone()} solution_len={solution_len}>
                     {crate::constants::config::ENTER_TEXT}
                 </Key>
                 {render_row(&row3)}
-                <Key width={40} value="DELETE" on_click={click_key.clone()} solution_len={solution_len}>
+                <Key value="DELETE" on_click={click_key.clone()} solution_len={solution_len}>
                     {crate::constants::config::DELETE_TEXT}
                 </Key>
-                <div class="flex mx-0.5" style="flex: 20 1 0%; pointer-events: none;"></div>
             </div>
         </div>
     }
