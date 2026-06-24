@@ -446,6 +446,12 @@ svg.cursor-pointer:hover {
 }
 
 /* Base body background override */
+html, body {
+  height: 100dvh;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
 body {
   background-color: var(--bg-color) !important;
   color: var(--text-color) !important;
