@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Rustle.  If not, see <https://www.gnu.org/licenses/>.
 
-#![allow(deprecated)]
+#![allow(deprecated, dead_code, unused_imports, unused_variables)]
 
 use yew::prelude::*;
 use web_sys::{window, HtmlCanvasElement, CanvasRenderingContext2d};
@@ -180,118 +180,6 @@ fn update_and_draw(
 }
 
 #[function_component(WeatherContainer)]
-pub fn weather_container(props: &WeatherContainerProps) -> Html {
-    let canvas_ref = use_node_ref();
-    let theme = props.theme.clone();
-    let is_active = props.is_active;
-
-    {
-        let canvas_ref = canvas_ref.clone();
-        use_effect_with((theme, is_active), move |(theme, is_active)| {
-            let canvas_opt = canvas_ref.cast::<HtmlCanvasElement>();
-            let loop_closure: LoopClosure = Rc::new(RefCell::new(None));
-
-            if *is_active {
-                if let Some(canvas) = &canvas_opt {
-                    if let Ok(Some(ctx)) = canvas.get_context("2d") {
-                        if let Ok(context) = ctx.dyn_into::<CanvasRenderingContext2d>() {
-                            let effect = match theme.as_str() {
-                                "crateria" => "rain",
-                                "brinstar" => "pollen",
-                                "norfair" => "ember",
-                                "wrecked_ship" => "wisp",
-                                "maridia" => "bubble",
-                                "tourian" => "spore",
-                                "newyear" => "confetti",
-                                "valentine" => "heart",
-                                "stpatrick" => "shamrock",
-                                "easter" => "easteregg",
-                                "independence" => "sparkle",
-                                "halloween" => "spooky",
-                                "thanksgiving" => "leaf",
-                                "christmas" => "snowflake",
-                                _ => "rain",
-                            };
-
-                            let particles = Rc::new(RefCell::new(Vec::<Particle>::new()));
-                            let win = window().unwrap();
-                            let w = win.inner_width().unwrap().as_f64().unwrap() as f32;
-                            let h = win.inner_height().unwrap().as_f64().unwrap() as f32;
-                            canvas.set_width(w as u32);
-                            canvas.set_height(h as u32);
-
-                            for _ in 0..30 {
-                                let mut parts = particles.borrow_mut();
-                                spawn_particle(&mut parts, effect, w, h);
-                                if let Some(p) = parts.last_mut() {
-                                    p.y = js_sys::Math::random() as f32 * h;
-                                }
-                            }
-
-                            let loop_clone = loop_closure.clone();
-                            let loop_for_frame = loop_closure.clone();
-                            let parts_clone = particles.clone();
-                            let canvas_clone = canvas.clone();
-                            let ctx_clone = context.clone();
-                            let effect_str = effect.to_string();
-                            let mut frame_count = 0;
-
-                            *loop_clone.borrow_mut() = Some(Closure::new(move || {
-                                let win = window().unwrap();
-                                let width = win.inner_width().unwrap().as_f64().unwrap() as f32;
-                                let height = win.inner_height().unwrap().as_f64().unwrap() as f32;
-
-                                if canvas_clone.width() != width as u32 || canvas_clone.height() != height as u32 {
-                                    canvas_clone.set_width(width as u32);
-                                    canvas_clone.set_height(height as u32);
-                                }
-
-                                frame_count += 1;
-                                let spawn_rate = if effect_str == "rain" { 2 } else { 8 };
-                                if frame_count % spawn_rate == 0 {
-                                    let mut parts = parts_clone.borrow_mut();
-                                    if parts.len() < 120 {
-                                        spawn_particle(&mut parts, &effect_str, width, height);
-                                    }
-                                }
-
-                                let grid_rect = get_element_rect("game-grid", true);
-                                let kb_rect = get_element_rect(".keyboard-container", false);
-
-                                let mut parts = parts_clone.borrow_mut();
-                                update_and_draw(&mut parts, &ctx_clone, width, height, &effect_str, &grid_rect, &kb_rect);
-
-                                let borrow = loop_for_frame.borrow();
-                                if let Some(ref closure) = *borrow {
-                                    let _ = win.request_animation_frame(closure.as_ref().unchecked_ref());
-                                }
-                            }));
-
-                            let borrow = loop_clone.borrow();
-                            if let Some(ref closure) = *borrow {
-                                let _ = win.request_animation_frame(closure.as_ref().unchecked_ref());
-                            }
-                        }
-                    }
-                }
-            } else {
-                if let Some(canvas) = &canvas_opt {
-                    if let Ok(Some(ctx)) = canvas.get_context("2d") {
-                        if let Ok(ctx2d) = ctx.dyn_into::<CanvasRenderingContext2d>() {
-                            ctx2d.clear_rect(0.0, 0.0, canvas.width() as f64, canvas.height() as f64);
-                        }
-                    }
-                }
-            }
-
-            let loop_cleanup = loop_closure.clone();
-            move || {
-                *loop_cleanup.borrow_mut() = None;
-            }
-        });
-    }
-
-    html! {
-        <canvas ref={canvas_ref} id="weather-canvas" class="fixed inset-0 pointer-events-none z-0"></canvas>
-    }
+pub fn weather_container(_props: &WeatherContainerProps) -> Html {
+    html! {}
 }
