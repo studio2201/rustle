@@ -18,6 +18,8 @@
 //! Rustle App view coordinator.
 //! Coordinates layout structure, handles user key input, and manages game status alerts.
 
+pub mod enter;
+
 use crate::app_effects::use_app_effects;
 use crate::app_state::{Action, AppState};
 use crate::components::alerts::Alert;
@@ -81,118 +83,12 @@ pub fn app() -> Html {
         Callback::from(move |_| state.dispatch(Action::DeleteChar))
     };
 
-    let on_enter = {
-        let state = state.clone();
-        let show_alert = show_alert.clone();
-        Callback::from(move |_| {
-            if state.is_game_won || state.is_game_lost {
-                return;
-            }
-            let guess_len = state.current_guess.chars().count();
-            let sol_len = solution.chars().count();
-
-            if guess_len < sol_len {
-                show_alert.emit((
-                    NOT_ENOUGH_LETTERS_MESSAGE.to_string(),
-                    "error".to_string(),
-                    ALERT_TIME_MS,
-                ));
-                state.dispatch(Action::SetJiggle("jiggle".to_string()));
-                return;
-            }
-
-            let word = state.current_guess.clone().to_uppercase();
-            if !crate::helpers::words::is_word_in_word_list(&word) {
-                show_alert.emit((
-                    WORD_NOT_FOUND_MESSAGE.to_string(),
-                    "error".to_string(),
-                    ALERT_TIME_MS,
-                ));
-                state.dispatch(Action::SetJiggle("jiggle".to_string()));
-                return;
-            }
-
-            if state.is_hard_mode {
-                if let Some(fail) =
-                    crate::helpers::words::find_first_unused_reveal(&word, &state.guesses, solution)
-                {
-                    show_alert.emit((fail, "error".to_string(), ALERT_TIME_MS));
-                    state.dispatch(Action::SetJiggle("jiggle".to_string()));
-                    return;
-                }
-            }
-
-            state.dispatch(Action::SetRevealing(true));
-            let state_rev = state.clone();
-            gloo_timers::callback::Timeout::new(REVEAL_TIME_MS * sol_len as u32, move || {
-                state_rev.dispatch(Action::SetRevealing(false))
-            })
-            .forget();
-
-            let mut new_guesses = state.guesses.clone();
-            new_guesses.push(word.clone());
-            state.dispatch(Action::SetGuesses(new_guesses.clone()));
-
-            crate::helpers::local_storage::save_game_state_to_local_storage(
-                is_latest_game,
-                &crate::helpers::local_storage::StoredGameState {
-                    guesses: new_guesses.clone(),
-                    solution: solution.to_string(),
-                },
-            );
-
-            state.dispatch(Action::ClearGuess);
-
-            if crate::helpers::words::is_winning_word(&word, solution) {
-                state.dispatch(Action::SetWon(true));
-                state.dispatch(Action::SetGameStats(
-                    crate::helpers::stats::add_stats_for_completed_game(
-                        state.game_stats.clone(),
-                        new_guesses.len() - 1,
-                    ),
-                ));
-
-                let win_message = WIN_MESSAGES[js_sys::Math::floor(
-                    js_sys::Math::random() * WIN_MESSAGES.len() as f64,
-                ) as usize];
-                let state_won = state.clone();
-                let show_alert_clone = show_alert.clone();
-                gloo_timers::callback::Timeout::new(REVEAL_TIME_MS * sol_len as u32, move || {
-                    show_alert_clone.emit((
-                        win_message.to_string(),
-                        "success".to_string(),
-                        ALERT_TIME_MS,
-                    ));
-                    state_won.dispatch(Action::SetStatsOpen(true));
-                    state_won.dispatch(Action::SetEffectsActive(true));
-                })
-                .forget();
-            } else if new_guesses.len() >= MAX_CHALLENGES {
-                state.dispatch(Action::SetLost(true));
-                state.dispatch(Action::SetGameStats(
-                    crate::helpers::stats::add_stats_for_completed_game(
-                        state.game_stats.clone(),
-                        new_guesses.len(),
-                    ),
-                ));
-
-                let state_lost = state.clone();
-                let show_alert_clone = show_alert.clone();
-                gloo_timers::callback::Timeout::new(
-                    REVEAL_TIME_MS * (sol_len as u32 + 1),
-                    move || {
-                        show_alert_clone.emit((
-                            correct_word_message(solution),
-                            "error".to_string(),
-                            LONG_ALERT_TIME_MS,
-                        ));
-                        state_lost.dispatch(Action::SetStatsOpen(true));
-                    },
-                )
-                .forget();
-            }
-        })
-    };
+    let on_enter = enter::build_on_enter(
+        state.clone(),
+        show_alert.clone(),
+        solution,
+        is_latest_game,
+    );
 
     let on_theme_click = {
         let state = state.clone();
