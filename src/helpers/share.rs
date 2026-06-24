@@ -23,6 +23,7 @@ use crate::helpers::statuses::get_guess_statuses;
 use web_sys::window;
 
 /// Formats the final game performance as a text block and exports it via the navigator share API or clipboard.
+#[allow(clippy::too_many_arguments)]
 pub fn share_status(
     solution: &str,
     guesses: &[String],

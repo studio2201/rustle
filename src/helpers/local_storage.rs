@@ -124,7 +124,7 @@ pub struct StoredPreferences {
 
 pub fn save_preferences_to_local_storage(prefs: &StoredPreferences) {
     let _ = LocalStorage::set(PREFERENCES_KEY, prefs);
-    let _ = LocalStorage::delete(HIGH_CONTRAST_KEY);
+    LocalStorage::delete(HIGH_CONTRAST_KEY);
     #[cfg(target_arch = "wasm32")]
     if let Some(win) = web_sys::window() {
         if let Ok(Some(storage)) = win.local_storage() {
@@ -150,9 +150,7 @@ pub fn load_preferences_from_local_storage(prefers_dark: bool) -> StoredPreferen
     if let Ok(legacy) = LocalStorage::get::<LegacyPreferences>(PREFERENCES_KEY) {
         let raw_theme = if let Some(t) = legacy.theme {
             t
-        } else if legacy.is_military_theme.unwrap_or(false) {
-            "nord".to_string()
-        } else if legacy.is_high_contrast.unwrap_or(false) {
+        } else if legacy.is_military_theme.unwrap_or(false) || legacy.is_high_contrast.unwrap_or(false) {
             "nord".to_string()
         } else if legacy.is_dark_mode.unwrap_or(prefers_dark) {
             "dark".to_string()
