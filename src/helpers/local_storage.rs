@@ -150,7 +150,9 @@ pub fn load_preferences_from_local_storage(prefers_dark: bool) -> StoredPreferen
     if let Ok(legacy) = LocalStorage::get::<LegacyPreferences>(PREFERENCES_KEY) {
         let raw_theme = if let Some(t) = legacy.theme {
             t
-        } else if legacy.is_military_theme.unwrap_or(false) || legacy.is_high_contrast.unwrap_or(false) {
+        } else if legacy.is_military_theme.unwrap_or(false)
+            || legacy.is_high_contrast.unwrap_or(false)
+        {
             "nord".to_string()
         } else if legacy.is_dark_mode.unwrap_or(prefers_dark) {
             "dark".to_string()
@@ -166,13 +168,20 @@ pub fn load_preferences_from_local_storage(prefers_dark: bool) -> StoredPreferen
             t => t.to_string(),
         };
         let is_hard_mode = legacy.is_hard_mode.unwrap_or(false);
-        let mut prefs = StoredPreferences { theme, is_hard_mode };
+        let mut prefs = StoredPreferences {
+            theme,
+            is_hard_mode,
+        };
         migrate_holiday_theme(&mut prefs);
         return prefs;
     }
 
     #[allow(unused_mut)]
-    let mut theme = if prefers_dark { "crateria".to_string() } else { "brinstar".to_string() };
+    let mut theme = if prefers_dark {
+        "crateria".to_string()
+    } else {
+        "brinstar".to_string()
+    };
     #[allow(unused_mut)]
     let mut is_hard_mode = false;
     #[cfg(target_arch = "wasm32")]

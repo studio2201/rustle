@@ -90,17 +90,17 @@ fn test_beta_indices_and_solutions() {
     // 2026-06-25 is a beta date (before 2026-07-01), index should be negative.
     let date_a = NaiveDate::from_ymd_opt(2026, 6, 25).unwrap();
     let date_b = NaiveDate::from_ymd_opt(2026, 6, 26).unwrap();
-    
+
     let index_a = get_index(date_a);
     let index_b = get_index(date_b);
-    
+
     assert!(index_a < 0);
     assert!(index_b < 0);
     assert_ne!(index_a, index_b);
-    
+
     let word_a = get_word_of_day(index_a);
     let word_b = get_word_of_day(index_b);
-    
+
     assert_eq!(word_a.len(), 5);
     assert_eq!(word_b.len(), 5);
     // Verify we get distinct words for distinct negative indices

@@ -63,20 +63,17 @@ pub fn use_app_effects(
     // Toggle document element classes and data-theme for cycle-based themes
     {
         let theme = state.theme.clone();
-        use_effect_with(
-            theme,
-            move |theme| {
-                if let Some(win) = web_sys::window() {
-                    if let Some(doc) = win.document() {
-                        if let Some(el) = doc.document_element() {
-                            let class_name = format!("{} dark", theme);
-                            let _ = el.set_attribute("class", &class_name);
-                            let _ = el.set_attribute("data-theme", theme);
-                        }
+        use_effect_with(theme, move |theme| {
+            if let Some(win) = web_sys::window() {
+                if let Some(doc) = win.document() {
+                    if let Some(el) = doc.document_element() {
+                        let class_name = format!("{} dark", theme);
+                        let _ = el.set_attribute("class", &class_name);
+                        let _ = el.set_attribute("data-theme", theme);
                     }
                 }
-            },
-        );
+            }
+        });
     }
 
     // Clear jiggle animation class after duration has run

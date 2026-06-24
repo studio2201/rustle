@@ -41,11 +41,7 @@ pub fn share_status(
     };
     let hard_indicator = if is_hard_mode { "*" } else { "" };
 
-    let emoji_grid = generate_emoji_grid(
-        solution,
-        guesses,
-        &get_emoji_tiles(theme),
-    );
+    let emoji_grid = generate_emoji_grid(solution, guesses, &get_emoji_tiles(theme));
 
     let puzzle_num_str = if solution_index < 0 {
         format!("Beta #{}", solution_index.abs())

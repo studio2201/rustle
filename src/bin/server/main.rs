@@ -34,7 +34,7 @@ use std::net::SocketAddr;
 use tower_http::services::{ServeDir, ServeFile};
 
 #[cfg(not(target_arch = "wasm32"))]
-use auth::{AppState, auth_middleware, logout, pin_required, verify_pin, auth_check};
+use auth::{auth_check, auth_middleware, logout, pin_required, verify_pin, AppState};
 #[cfg(not(target_arch = "wasm32"))]
 use handlers::{serve_asset_manifest, serve_index, serve_service_worker};
 
@@ -63,10 +63,7 @@ async fn run() {
         .or_else(|_| std::env::var("PIN"))
         .ok()
         .filter(|p| {
-            !p.is_empty()
-                && p.chars().all(|c| c.is_ascii_digit())
-                && p.len() >= 4
-                && p.len() <= 10
+            !p.is_empty() && p.chars().all(|c| c.is_ascii_digit()) && p.len() >= 4 && p.len() <= 10
         });
 
     let app_state = AppState {
@@ -91,7 +88,10 @@ async fn run() {
         .route("/", get(serve_index))
         .route("/index.html", get(serve_index))
         .fallback_service(ServeDir::new("dist").fallback(ServeFile::new("dist/index.html")))
-        .layer(middleware::from_fn_with_state(app_state.clone(), auth_middleware))
+        .layer(middleware::from_fn_with_state(
+            app_state.clone(),
+            auth_middleware,
+        ))
         .layer(cors)
         .with_state(app_state.clone());
 

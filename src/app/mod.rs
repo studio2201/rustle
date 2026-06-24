@@ -83,12 +83,8 @@ pub fn app() -> Html {
         Callback::from(move |_| state.dispatch(Action::DeleteChar))
     };
 
-    let on_enter = enter::build_on_enter(
-        state.clone(),
-        show_alert.clone(),
-        solution,
-        is_latest_game,
-    );
+    let on_enter =
+        enter::build_on_enter(state.clone(), show_alert.clone(), solution, is_latest_game);
 
     let on_theme_click = {
         let state = state.clone();

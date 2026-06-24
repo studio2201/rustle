@@ -60,12 +60,7 @@ pub async fn verify_pin(
                 "RUSTLE_PIN=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0",
             ),
         );
-        return (
-            StatusCode::OK,
-            headers,
-            Json(json!({ "success": true })),
-        )
-            .into_response();
+        return (StatusCode::OK, headers, Json(json!({ "success": true }))).into_response();
     };
 
     let pin_str = payload.pin.as_deref().unwrap_or("").trim();
@@ -87,12 +82,7 @@ pub async fn verify_pin(
             ))
             .unwrap(),
         );
-        (
-            StatusCode::OK,
-            headers,
-            Json(json!({ "success": true })),
-        )
-            .into_response()
+        (StatusCode::OK, headers, Json(json!({ "success": true }))).into_response()
     } else {
         (
             StatusCode::UNAUTHORIZED,
@@ -102,10 +92,7 @@ pub async fn verify_pin(
     }
 }
 
-pub async fn auth_check(
-    headers: HeaderMap,
-    State(state): State<AppState>,
-) -> impl IntoResponse {
+pub async fn auth_check(headers: HeaderMap, State(state): State<AppState>) -> impl IntoResponse {
     if let Some(ref pin) = state.pin {
         if !is_authorized(&headers, pin) {
             return StatusCode::UNAUTHORIZED.into_response();
@@ -118,16 +105,9 @@ pub async fn logout() -> impl IntoResponse {
     let mut headers = HeaderMap::new();
     headers.insert(
         header::SET_COOKIE,
-        header::HeaderValue::from_static(
-            "RUSTLE_PIN=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0",
-        ),
+        header::HeaderValue::from_static("RUSTLE_PIN=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0"),
     );
-    (
-        StatusCode::OK,
-        headers,
-        Json(json!({ "success": true })),
-    )
-        .into_response()
+    (StatusCode::OK, headers, Json(json!({ "success": true }))).into_response()
 }
 
 pub async fn auth_middleware(

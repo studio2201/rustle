@@ -34,6 +34,7 @@ pub mod navbar;
 pub mod stat_bar;
 pub mod stat_histogram;
 pub mod weather;
+pub mod weather_engine;
 
 // Modal components split into individual modular modules.
 pub mod modal_base;

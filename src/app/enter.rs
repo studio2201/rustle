@@ -15,12 +15,12 @@
 // You should have received a copy of the GNU General Public License
 // along with Rustle.  If not, see <https://www.gnu.org/licenses/>.
 
-use yew::prelude::*;
 use crate::app_state::{Action, AppState};
 use crate::constants::config::{
-    MAX_CHALLENGES, ALERT_TIME_MS, LONG_ALERT_TIME_MS, NOT_ENOUGH_LETTERS_MESSAGE,
-    WORD_NOT_FOUND_MESSAGE, REVEAL_TIME_MS, WIN_MESSAGES, correct_word_message,
+    correct_word_message, ALERT_TIME_MS, LONG_ALERT_TIME_MS, MAX_CHALLENGES,
+    NOT_ENOUGH_LETTERS_MESSAGE, REVEAL_TIME_MS, WIN_MESSAGES, WORD_NOT_FOUND_MESSAGE,
 };
+use yew::prelude::*;
 
 pub fn build_on_enter(
     state: UseReducerHandle<AppState>,
@@ -96,9 +96,8 @@ pub fn build_on_enter(
                 ),
             ));
 
-            let win_message = WIN_MESSAGES[js_sys::Math::floor(
-                js_sys::Math::random() * WIN_MESSAGES.len() as f64,
-                ) as usize];
+            let win_message = WIN_MESSAGES
+                [js_sys::Math::floor(js_sys::Math::random() * WIN_MESSAGES.len() as f64) as usize];
             let state_won = state.clone();
             let show_alert_clone = show_alert.clone();
             gloo_timers::callback::Timeout::new(REVEAL_TIME_MS * sol_len as u32, move || {
@@ -122,17 +121,14 @@ pub fn build_on_enter(
 
             let state_lost = state.clone();
             let show_alert_clone = show_alert.clone();
-            gloo_timers::callback::Timeout::new(
-                REVEAL_TIME_MS * (sol_len as u32 + 1),
-                move || {
-                    show_alert_clone.emit((
-                        correct_word_message(solution),
-                        "error".to_string(),
-                        LONG_ALERT_TIME_MS,
-                    ));
-                    state_lost.dispatch(Action::SetStatsOpen(true));
-                },
-            )
+            gloo_timers::callback::Timeout::new(REVEAL_TIME_MS * (sol_len as u32 + 1), move || {
+                show_alert_clone.emit((
+                    correct_word_message(solution),
+                    "error".to_string(),
+                    LONG_ALERT_TIME_MS,
+                ));
+                state_lost.dispatch(Action::SetStatsOpen(true));
+            })
             .forget();
         }
     })

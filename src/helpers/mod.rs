@@ -32,12 +32,12 @@
 
 pub mod browser;
 pub mod encryption;
+pub mod holidays;
 pub mod local_storage;
 pub mod share;
 pub mod stats;
 pub mod statuses;
 pub mod words;
-pub mod holidays;
 
 // Re-export common types for internal convenience
 pub use browser::is_in_app_browser;

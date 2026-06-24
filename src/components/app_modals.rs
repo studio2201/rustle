@@ -69,8 +69,6 @@ pub fn app_modals(props: &AppModalsProps) -> Html {
         })
     };
 
-
-
     html! {
         <>
             <InfoModal

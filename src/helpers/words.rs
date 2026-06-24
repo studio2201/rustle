@@ -53,11 +53,12 @@ pub struct SolutionInfo {
 
 pub fn get_solution(game_date: NaiveDate) -> SolutionInfo {
     let index = get_index(game_date);
-    let solution = if let Some((prefix, _)) = crate::helpers::holidays::get_holiday_for_date(game_date) {
-        crate::helpers::holidays::get_holiday_word(prefix, index)
-    } else {
-        get_word_of_day(index)
-    };
+    let solution =
+        if let Some((prefix, _)) = crate::helpers::holidays::get_holiday_for_date(game_date) {
+            crate::helpers::holidays::get_holiday_word(prefix, index)
+        } else {
+            get_word_of_day(index)
+        };
     let tomorrow_date = game_date + Duration::days(1);
     let tomorrow_dt = tomorrow_date.and_hms_opt(0, 0, 0).unwrap_or_default();
     let tomorrow_ms = tomorrow_dt.and_utc().timestamp_millis();

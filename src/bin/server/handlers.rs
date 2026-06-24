@@ -15,6 +15,8 @@
 // You should have received a copy of the GNU General Public License
 // along with Rustle.  If not, see <https://www.gnu.org/licenses/>.
 
+use super::auth::{is_authorized, AppState, LOGIN_HTML};
+use super::utils::{build_asset_manifest, get_holiday_for_date};
 use axum::{
     extract::{Query, State},
     http::{header, HeaderMap, StatusCode},
@@ -22,8 +24,6 @@ use axum::{
     Json,
 };
 use serde::Deserialize;
-use super::auth::{AppState, LOGIN_HTML, is_authorized};
-use super::utils::{build_asset_manifest, get_holiday_for_date};
 
 #[derive(Deserialize)]
 pub struct IndexParams {
@@ -66,14 +66,25 @@ pub async fn serve_index(
     let is_today = game_date == chrono::Local::now().date_naive();
     let display_title = if let Some((_, holiday_name)) = holiday_info {
         if is_today {
-            format!("{} {} - Special {} Edition!", state.site_title, puzzle_num_str, holiday_name)
+            format!(
+                "{} {} - Special {} Edition!",
+                state.site_title, puzzle_num_str, holiday_name
+            )
         } else {
-            format!("{} {} ({} Archive)", state.site_title, puzzle_num_str, holiday_name)
+            format!(
+                "{} {} ({} Archive)",
+                state.site_title, puzzle_num_str, holiday_name
+            )
         }
     } else if is_today {
         format!("{} {}", state.site_title, puzzle_num_str)
     } else {
-        format!("{} {} (Archive - {})", state.site_title, puzzle_num_str, game_date.format("%Y-%m-%d"))
+        format!(
+            "{} {} (Archive - {})",
+            state.site_title,
+            puzzle_num_str,
+            game_date.format("%Y-%m-%d")
+        )
     };
 
     let display_description = if let Some((_, holiday_name)) = holiday_info {
@@ -100,10 +111,16 @@ pub async fn serve_index(
                     new_content.push_str(&content[actual_end..]);
                     new_content
                 } else {
-                    content.replace("<title>Rustle</title>", &format!("<title>{}</title>", display_title))
+                    content.replace(
+                        "<title>Rustle</title>",
+                        &format!("<title>{}</title>", display_title),
+                    )
                 }
             } else {
-                content.replace("<title>Rustle</title>", &format!("<title>{}</title>", display_title))
+                content.replace(
+                    "<title>Rustle</title>",
+                    &format!("<title>{}</title>", display_title),
+                )
             };
 
             // Replace main description
@@ -114,8 +131,14 @@ pub async fn serve_index(
 
             // Replace Open Graph and Twitter placeholders
             rendered = rendered
-                .replace("content=\"Rustle (Title)\"", &format!("content=\"{}\"", display_title))
-                .replace("content=\"Rustle (Description)\"", &format!("content=\"{}\"", display_description));
+                .replace(
+                    "content=\"Rustle (Title)\"",
+                    &format!("content=\"{}\"", display_title),
+                )
+                .replace(
+                    "content=\"Rustle (Description)\"",
+                    &format!("content=\"{}\"", display_description),
+                );
 
             Html(rendered).into_response()
         }
