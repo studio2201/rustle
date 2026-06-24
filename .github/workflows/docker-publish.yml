@@ -3,7 +3,7 @@ name: "Build & Publish Docker Image (CD)"
 on:
   push:
     branches:
-      - master
+      - main
       - dev
   workflow_dispatch:
 
@@ -66,49 +66,37 @@ jobs:
           LOWER_IMAGE_NAME_DOCKER=$(echo "ubermetroid/rustle" | tr '[:upper:]' '[:lower:]')
           VERSION=${{ steps.package_version.outputs.VERSION }}
           
-          # GHCR tags
-          GHCR_TAGS="${LOWER_IMAGE_NAME_GHCR}:${VERSION}"
-          if [ "${{ github.ref }}" = "refs/heads/master" ]; then
-            GHCR_TAGS="${GHCR_TAGS},${LOWER_IMAGE_NAME_GHCR}:latest"
+          # Initialize tags list
+          TAGS=""
+          
+          # Add GHCR tags
+          TAGS="${TAGS}${LOWER_IMAGE_NAME_GHCR}:${VERSION}"
+          if [ "${{ github.ref }}" = "refs/heads/main" ]; then
+            TAGS="${TAGS},${LOWER_IMAGE_NAME_GHCR}:latest"
           elif [ "${{ github.ref }}" = "refs/heads/dev" ]; then
-            GHCR_TAGS="${GHCR_TAGS},${LOWER_IMAGE_NAME_GHCR}:dev"
+            TAGS="${TAGS},${LOWER_IMAGE_NAME_GHCR}:dev"
           fi
           
-          # Docker Hub tags
-          DOCKER_TAGS="${LOWER_IMAGE_NAME_DOCKER}:${VERSION}"
-          if [ "${{ github.ref }}" = "refs/heads/master" ]; then
-            DOCKER_TAGS="${DOCKER_TAGS},${LOWER_IMAGE_NAME_DOCKER}:latest"
-          elif [ "${{ github.ref }}" = "refs/heads/dev" ]; then
-            DOCKER_TAGS="${DOCKER_TAGS},${LOWER_IMAGE_NAME_DOCKER}:dev"
+          # Add Docker Hub tags (if credentials exist)
+          if [ "${{ secrets.DOCKER_USERNAME }}" != "" ]; then
+            TAGS="${TAGS},${LOWER_IMAGE_NAME_DOCKER}:${VERSION}"
+            if [ "${{ github.ref }}" = "refs/heads/main" ]; then
+              TAGS="${TAGS},${LOWER_IMAGE_NAME_DOCKER}:latest"
+            elif [ "${{ github.ref }}" = "refs/heads/dev" ]; then
+              TAGS="${TAGS},${LOWER_IMAGE_NAME_DOCKER}:dev"
+            fi
           fi
           
-          echo "GHCR_TAGS=${GHCR_TAGS}" >> $GITHUB_OUTPUT
-          echo "DOCKER_TAGS=${DOCKER_TAGS}" >> $GITHUB_OUTPUT
-          echo "Generated GHCR tags: ${GHCR_TAGS}"
-          echo "Generated Docker Hub tags: ${DOCKER_TAGS}"
+          echo "TAGS=${TAGS}" >> $GITHUB_OUTPUT
+          echo "Generated tags: ${TAGS}"
 
-      - name: Build and Push to Docker Hub
-        if: ${{ env.DOCKER_USERNAME != '' }}
+      - name: Build and Push Docker Image
         uses: docker/build-push-action@v6
         with:
           context: .
           platforms: ${{ env.PLATFORMS }}
           push: true
-          tags: ${{ steps.meta.outputs.DOCKER_TAGS }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-          provenance: false
-          build-args: |
-            BUILDKIT_INLINE_CACHE=1
-
-      - name: Build and Push to GHCR
-        uses: docker/build-push-action@v6
-        continue-on-error: true
-        with:
-          context: .
-          platforms: ${{ env.PLATFORMS }}
-          push: true
-          tags: ${{ steps.meta.outputs.GHCR_TAGS }}
+          tags: ${{ steps.meta.outputs.TAGS }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
           provenance: false
