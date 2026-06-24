@@ -211,7 +211,7 @@ pub fn keyboard(props: &KeyboardProps) -> Html {
     let render_row = |keys: &[&str]| keys.iter().map(|&key| render_key(key)).collect::<Html>();
 
     html! {
-        <div class="keyboard-container mx-auto select-none pb-1 sm:pb-2">
+        <div class="keyboard-container mx-auto select-none pb-0 sm:pb-2">
             <div class="flex justify-center w-full mb-1">
                 {render_row(&row1)}
             </div>
