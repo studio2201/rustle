@@ -58,9 +58,9 @@ pub fn key_btn(props: &KeyProps) -> Html {
     let is_special_key = value == "ENTER" || value == "DELETE";
 
     let (width_class, height_class) = if is_special_key {
-        ("w-12 sm:w-16 md:w-20 lg:w-24", "h-12 sm:h-14")
+        ("w-12 sm:w-16 md:w-20 lg:w-24", "h-10 sm:h-14")
     } else {
-        ("w-8 sm:w-10 md:w-12 lg:w-14", "h-12 sm:h-14")
+        ("w-8 sm:w-10 md:w-12 lg:w-14", "h-10 sm:h-14")
     };
 
     let mut key_classes = classes!(
@@ -211,7 +211,7 @@ pub fn keyboard(props: &KeyboardProps) -> Html {
     let render_row = |keys: &[&str]| keys.iter().map(|&key| render_key(key)).collect::<Html>();
 
     html! {
-        <div class="keyboard-container mx-auto select-none pb-2">
+        <div class="keyboard-container mx-auto select-none pb-1 sm:pb-2">
             <div class="flex justify-center w-full mb-1">
                 {render_row(&row1)}
             </div>

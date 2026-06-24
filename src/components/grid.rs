@@ -64,10 +64,10 @@ pub fn cell(props: &CellProps) -> Html {
         "short:text-2xl",
         "short:w-12",
         "short:h-12",
-        "w-[15vw]",
-        "h-[15vw]",
-        "max-w-[62px]",
-        "max-h-[62px]",
+        "w-[14vw]",
+        "h-[14vw]",
+        "max-w-[58px]",
+        "max-h-[58px]",
         "sm:w-14",
         "sm:h-14",
         "border-solid",
@@ -175,7 +175,7 @@ pub fn grid(props: &GridProps) -> Html {
     let empties_count = (MAX_CHALLENGES - 1).saturating_sub(guesses_len);
 
     html! {
-        <div class="flex-grow flex flex-col justify-center pb-2">
+        <div class="flex-grow flex flex-col justify-center pb-1 sm:pb-2">
             {for props.guesses.iter().enumerate().map(|(i, g)| {
                 html! {
                     <CompletedRow
