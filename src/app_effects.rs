@@ -69,7 +69,17 @@ pub fn use_app_effects(
                 if let Some(win) = web_sys::window() {
                     if let Some(doc) = win.document() {
                         if let Some(el) = doc.document_element() {
-                            let _ = el.set_attribute("class", theme);
+                            let is_dark = theme.ends_with("-dark")
+                                || theme == "crateria"
+                                || theme == "norfair"
+                                || theme == "wrecked_ship"
+                                || theme == "tourian";
+                            let class_name = if is_dark {
+                                format!("{} dark", theme)
+                            } else {
+                                theme.to_string()
+                            };
+                            let _ = el.set_attribute("class", &class_name);
                             let _ = el.set_attribute("data-theme", theme);
                         }
                     }

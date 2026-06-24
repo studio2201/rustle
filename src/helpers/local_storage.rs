@@ -207,8 +207,7 @@ fn migrate_holiday_theme(prefs: &mut StoredPreferences) {
     let holiday_info = crate::helpers::holidays::get_holiday_for_date(date);
     if let Some((prefix, _)) = holiday_info {
         if !crate::helpers::holidays::is_holiday_theme(&prefs.theme) {
-            let is_light = prefs.theme == "brinstar" || prefs.theme == "maridia" || prefs.theme.ends_with("-light");
-            prefs.theme = format!("{}-{}", prefix, if is_light { "light" } else { "dark" });
+            prefs.theme = format!("{}-dark", prefix);
         }
     } else if crate::helpers::holidays::is_holiday_theme(&prefs.theme) {
         let is_light = prefs.theme.ends_with("-light");
