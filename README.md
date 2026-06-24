@@ -61,3 +61,58 @@ Configure these settings inside your Docker Compose environment or container env
 | `ALLOWED_ORIGINS` | Comma-separated list of allowed HTTP request origins (CORS filter). Use `*` to allow all origins. | `*` |
 | `RUSTLE_PIN` | Optional 4–10 digit PIN (numerical only) to lock access to the interface. Leave empty for public mode. | None |
 | `TZ` | Timezone for the container processes and logs. | `UTC` |
+
+## 📂 Repository Structure
+
+```
+.
+└── src/
+    ├── app
+    │   ├── enter.rs
+    │   └── mod.rs
+    ├── app_effects.rs
+    ├── app_state.rs
+    ├── bin
+    │   └── server
+    │       ├── auth.rs
+    │       ├── handlers.rs
+    │       ├── login.html
+    │       ├── main.rs
+    │       └── utils.rs
+    ├── components
+    │   ├── alerts.rs
+    │   ├── app_modals.rs
+    │   ├── grid.rs
+    │   ├── keyboard.rs
+    │   ├── mod.rs
+    │   ├── modal_base.rs
+    │   ├── modal_date_picker.rs
+    │   ├── modal_info.rs
+    │   ├── modal_migrate.rs
+    │   ├── modal_stats.rs
+    │   ├── navbar.rs
+    │   ├── stat_bar.rs
+    │   ├── stat_histogram.rs
+    │   ├── weather.rs
+    │   └── weather_engine.rs
+    ├── constants
+    │   ├── config.rs
+    │   ├── valid_guesses.txt
+    │   ├── word_db.rs
+    │   └── wordlist.txt
+    ├── constants.rs
+    ├── helpers
+    │   ├── browser.rs
+    │   ├── encryption.rs
+    │   ├── holidays.rs
+    │   ├── local_storage.rs
+    │   ├── mod.rs
+    │   ├── share.rs
+    │   ├── stats.rs
+    │   ├── statuses.rs
+    │   ├── tests.rs
+    │   └── words.rs
+    ├── index.css
+    ├── main.rs
+    └── tailwind.css
+```
