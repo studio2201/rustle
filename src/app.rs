@@ -268,10 +268,8 @@ pub fn app() -> Html {
             />
             <Alert message={state.alert_msg.clone()} is_visible={state.alert_visible} variant={state.alert_variant.clone()} />
             <div class="mx-auto flex w-full max-w-7xl flex-grow flex-col px-1 py-1 sm:py-2 sm:px-6 lg:px-8">
-                <div class="flex-grow flex items-center justify-center">
-                    <Grid solution={solution} guesses={state.guesses.clone()} current_guess={state.current_guess.clone()} is_revealing={state.is_revealing} current_row_class_name={state.jiggle_class.clone()} />
-                </div>
-                <div class="w-full pb-2">
+                <Grid solution={solution} guesses={state.guesses.clone()} current_guess={state.current_guess.clone()} is_revealing={state.is_revealing} current_row_class_name={state.jiggle_class.clone()} />
+                <div class="my-auto w-full">
                     <Keyboard on_char={on_char} on_delete={on_delete} on_enter={on_enter} solution={solution} guesses={state.guesses.clone()} is_revealing={state.is_revealing} />
                 </div>
             </div>
