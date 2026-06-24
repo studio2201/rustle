@@ -247,7 +247,7 @@ pub fn app() -> Html {
     };
 
     html! {
-        <div class="flex h-screen flex-col justify-between app-container transition-colors duration-300">
+        <div class="flex h-screen h-dvh flex-col justify-between app-container transition-colors duration-300">
             <Navbar
                 on_info_click={ { let s = state.clone(); Callback::from(move |_| s.dispatch(Action::SetInfoOpen(true))) } }
                 on_stats_click={ { let s = state.clone(); Callback::from(move |_| s.dispatch(Action::SetStatsOpen(true))) } }

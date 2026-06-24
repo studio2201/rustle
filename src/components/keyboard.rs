@@ -55,6 +55,14 @@ pub fn key_btn(props: &KeyProps) -> Html {
         Some(CharStatus::Present) => "key-present",
     };
 
+    let is_special_key = value == "ENTER" || value == "DELETE";
+
+    let (width_class, height_class) = if is_special_key {
+        ("w-12 sm:w-16 md:w-20 lg:w-24", "h-12 sm:h-14")
+    } else {
+        ("w-8 sm:w-10 md:w-12 lg:w-14", "h-12 sm:h-14")
+    };
+
     let mut key_classes = classes!(
         "flex",
         "items-center",
@@ -71,8 +79,8 @@ pub fn key_btn(props: &KeyProps) -> Html {
         "xxshort:h-11",
         "short:w-12",
         "short:h-12",
-        "w-14",
-        "h-14",
+        width_class,
+        height_class,
         "key-btn"
     );
 
