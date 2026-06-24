@@ -60,35 +60,17 @@ pub fn use_app_effects(
         });
     }
 
-    // Toggle document element classes for Dark mode, High Contrast, Military, and Hard (Fiery) themes
+    // Toggle document element classes and data-theme for cycle-based themes
     {
-        let dark = state.is_dark_mode;
-        let contrast = state.is_high_contrast;
-        let military = state.is_military_theme;
-        let hard = state.is_hard_mode;
+        let theme = state.theme.clone();
         use_effect_with(
-            (dark, contrast, military, hard),
-            move |&(dark, contrast, military, hard)| {
+            theme,
+            move |theme| {
                 if let Some(win) = web_sys::window() {
                     if let Some(doc) = win.document() {
                         if let Some(el) = doc.document_element() {
-                            let class_list = el.class_list();
-                            let _ = class_list.remove_1("dark");
-                            let _ = class_list.remove_1("high-contrast");
-                            let _ = class_list.remove_1("military");
-                            let _ = class_list.remove_1("hard-mode");
-                            if dark {
-                                let _ = class_list.add_1("dark");
-                            }
-                            if contrast {
-                                let _ = class_list.add_1("high-contrast");
-                            }
-                            if military {
-                                let _ = class_list.add_1("military");
-                            }
-                            if hard {
-                                let _ = class_list.add_1("hard-mode");
-                            }
+                            let _ = el.set_attribute("class", theme);
+                            let _ = el.set_attribute("data-theme", theme);
                         }
                     }
                 }

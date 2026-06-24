@@ -23,14 +23,12 @@ use crate::helpers::statuses::get_guess_statuses;
 use web_sys::window;
 
 /// Formats the final game performance as a text block and exports it via the navigator share API or clipboard.
-#[allow(clippy::too_many_arguments)]
 pub fn share_status(
     solution: &str,
     guesses: &[String],
     lost: bool,
     is_hard_mode: bool,
-    is_dark_mode: bool,
-    is_high_contrast: bool,
+    theme: &str,
     solution_index: i32,
     handle_share_to_clipboard: impl FnOnce(),
     handle_share_failure: impl FnOnce(),
@@ -45,7 +43,7 @@ pub fn share_status(
     let emoji_grid = generate_emoji_grid(
         solution,
         guesses,
-        &get_emoji_tiles(is_dark_mode, is_high_contrast),
+        &get_emoji_tiles(theme),
     );
 
     let text_to_share = format!(
@@ -107,10 +105,10 @@ pub fn generate_emoji_grid(solution: &str, guesses: &[String], tiles: &[&str; 3]
     grid
 }
 
-/// Helper returning the target emoji tiles depending on dark/high-contrast display parameters.
-fn get_emoji_tiles(is_dark_mode: bool, is_high_contrast: bool) -> [&'static str; 3] {
-    let correct = if is_high_contrast { "🟧" } else { "🟩" };
-    let present = if is_high_contrast { "🟦" } else { "🟨" };
-    let absent = if is_dark_mode { "⬛" } else { "⬜" };
+/// Helper returning the target emoji tiles depending on selected theme display parameters.
+fn get_emoji_tiles(theme: &str) -> [&'static str; 3] {
+    let correct = if theme == "nord" { "🟧" } else { "🟩" };
+    let present = if theme == "nord" { "🟦" } else { "🟨" };
+    let absent = if theme == "light" || theme == "sepia" { "⬜" } else { "⬛" };
     [correct, present, absent]
 }

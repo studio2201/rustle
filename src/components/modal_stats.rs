@@ -103,8 +103,7 @@ pub struct StatsModalProps {
     pub handle_share_failure: Callback<()>,
     pub handle_migrate_stats_button: Callback<()>,
     pub is_hard_mode: bool,
-    pub is_dark_mode: bool,
-    pub is_high_contrast_mode: bool,
+    pub theme: String,
     pub solution_index: i32,
     pub tomorrow: i64,
 }
@@ -115,8 +114,7 @@ pub fn stats_modal(props: &StatsModalProps) -> Html {
     let guesses = props.guesses.clone();
     let is_game_lost = props.is_game_lost;
     let is_hard_mode = props.is_hard_mode;
-    let is_dark_mode = props.is_dark_mode;
-    let is_high_contrast_mode = props.is_high_contrast_mode;
+    let theme = props.theme.clone();
     let solution_index = props.solution_index;
     let handle_share_to_clipboard = props.handle_share_to_clipboard.clone();
     let handle_share_failure = props.handle_share_failure.clone();
@@ -129,8 +127,7 @@ pub fn stats_modal(props: &StatsModalProps) -> Html {
             &guesses,
             is_game_lost,
             is_hard_mode,
-            is_dark_mode,
-            is_high_contrast_mode,
+            &theme,
             solution_index,
             move || success.emit(()),
             move || fail.emit(()),

@@ -17,10 +17,7 @@
 
 use crate::{
     constants::config::REVEAL_TIME_MS,
-    helpers::{
-        local_storage::get_stored_is_high_contrast_mode,
-        statuses::{get_statuses, CharStatus},
-    },
+    helpers::statuses::{get_statuses, CharStatus},
 };
 use wasm_bindgen::JsCast;
 use yew::prelude::*;
@@ -43,7 +40,6 @@ pub fn key_btn(props: &KeyProps) -> Html {
     let value = props.value.clone();
     let on_click = props.on_click.clone();
     let key_delay_ms = REVEAL_TIME_MS as usize * props.solution_len;
-    let is_high_contrast = get_stored_is_high_contrast_mode();
     let status = props.status;
 
     let text_size_class = if value == "ENTER" || value == "DELETE" {
@@ -52,21 +48,11 @@ pub fn key_btn(props: &KeyProps) -> Html {
         "text-sm sm:text-base"
     };
 
-    let bg_class = match (status, is_high_contrast) {
-        (None, _) => "bg-slate-200 dark:bg-slate-600 hover:bg-slate-300 active:bg-slate-400",
-        (Some(CharStatus::Absent), _) => "bg-slate-400 dark:bg-slate-800 text-white",
-        (Some(CharStatus::Correct), true) => {
-            "bg-orange-500 hover:bg-orange-600 active:bg-orange-700 text-white"
-        }
-        (Some(CharStatus::Present), true) => {
-            "bg-cyan-500 hover:bg-cyan-600 active:bg-cyan-700 text-white"
-        }
-        (Some(CharStatus::Correct), false) => {
-            "bg-green-500 hover:bg-green-600 active:bg-green-700 text-white"
-        }
-        (Some(CharStatus::Present), false) => {
-            "bg-yellow-500 hover:bg-yellow-600 active:bg-yellow-700 text-white"
-        }
+    let bg_class = match status {
+        None => "key-default",
+        Some(CharStatus::Absent) => "key-absent",
+        Some(CharStatus::Correct) => "key-correct",
+        Some(CharStatus::Present) => "key-present",
     };
 
     let mut key_classes = classes!(
@@ -78,8 +64,6 @@ pub fn key_btn(props: &KeyProps) -> Html {
         "font-bold",
         "cursor-pointer",
         "select-none",
-        "text-slate-900",
-        "dark:text-white",
         "shadow-sm",
         "active:scale-95",
         "transition-transform",
@@ -88,11 +72,12 @@ pub fn key_btn(props: &KeyProps) -> Html {
         "short:w-12",
         "short:h-12",
         "w-14",
-        "h-14"
+        "h-14",
+        "key-btn"
     );
 
     key_classes.push(text_size_class.split_whitespace().collect::<Vec<_>>());
-    key_classes.push(bg_class.split_whitespace().collect::<Vec<_>>());
+    key_classes.push(bg_class);
 
     if props.is_revealing {
         key_classes.push("transition");

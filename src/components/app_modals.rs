@@ -72,17 +72,13 @@ pub fn app_modals(props: &AppModalsProps) -> Html {
 
     let save_prefs = {
         let state = state.clone();
-        move |dark: bool, contrast: bool, military: bool, hard: bool| {
-            state.dispatch(Action::SetDarkMode(dark));
-            state.dispatch(Action::SetHighContrast(contrast));
-            state.dispatch(Action::SetMilitaryTheme(military));
+        move |theme: String, hard: bool| {
+            state.dispatch(Action::SetTheme(theme.clone()));
             state.dispatch(Action::SetHardMode(hard));
             crate::helpers::local_storage::save_preferences_to_local_storage(
                 &crate::helpers::local_storage::StoredPreferences {
-                    is_dark_mode: dark,
-                    is_high_contrast: contrast,
+                    theme,
                     is_hard_mode: hard,
-                    is_military_theme: military,
                 },
             );
         }
@@ -95,7 +91,7 @@ pub fn app_modals(props: &AppModalsProps) -> Html {
         Callback::from(move |val| {
             if val {
                 if state.guesses.is_empty() {
-                    save_prefs(false, false, false, true);
+                    save_prefs(state.theme.clone(), true);
                 } else {
                     show_alert.emit((
                         HARD_MODE_ALERT_MESSAGE.to_string(),
@@ -104,40 +100,7 @@ pub fn app_modals(props: &AppModalsProps) -> Html {
                     ));
                 }
             } else {
-                save_prefs(false, false, false, false);
-            }
-        })
-    };
-
-    let handle_dark_mode = {
-        let save_prefs = save_prefs.clone();
-        Callback::from(move |val| {
-            if val {
-                save_prefs(true, false, false, false);
-            } else {
-                save_prefs(false, false, false, false);
-            }
-        })
-    };
-
-    let handle_high_contrast = {
-        let save_prefs = save_prefs.clone();
-        Callback::from(move |val| {
-            if val {
-                save_prefs(false, true, false, false);
-            } else {
-                save_prefs(false, false, false, false);
-            }
-        })
-    };
-
-    let handle_military_theme = {
-        let save_prefs = save_prefs.clone();
-        Callback::from(move |val| {
-            if val {
-                save_prefs(false, false, true, false);
-            } else {
-                save_prefs(false, false, false, false);
+                save_prefs(state.theme.clone(), false);
             }
         })
     };
@@ -160,12 +123,6 @@ pub fn app_modals(props: &AppModalsProps) -> Html {
                 } }
                 is_hard_mode={state.is_hard_mode}
                 handle_hard_mode={handle_hard_mode}
-                is_dark_mode={state.is_dark_mode}
-                handle_dark_mode={handle_dark_mode}
-                is_high_contrast_mode={state.is_high_contrast}
-                handle_high_contrast_mode={handle_high_contrast}
-                is_military_theme={state.is_military_theme}
-                handle_military_theme={handle_military_theme}
             />
 
             <StatsModal
@@ -190,8 +147,7 @@ pub fn app_modals(props: &AppModalsProps) -> Html {
                     })
                 } }
                 is_hard_mode={state.is_hard_mode}
-                is_dark_mode={state.is_dark_mode}
-                is_high_contrast_mode={state.is_high_contrast}
+                theme={state.theme.clone()}
                 solution_index={solution_index}
                 tomorrow={tomorrow}
             />

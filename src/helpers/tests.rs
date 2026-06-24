@@ -105,10 +105,8 @@ fn test_persistence_game_state_and_preferences() {
     assert_eq!(loaded.unwrap(), state);
 
     let prefs = StoredPreferences {
-        is_dark_mode: true,
-        is_high_contrast: false,
+        theme: "dark".to_string(),
         is_hard_mode: true,
-        is_military_theme: false,
     };
     save_preferences_to_local_storage(&prefs);
 

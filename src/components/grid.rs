@@ -16,7 +16,6 @@
 // along with Rustle.  If not, see <https://www.gnu.org/licenses/>.
 
 use crate::constants::config::{MAX_CHALLENGES, REVEAL_TIME_MS};
-use crate::helpers::local_storage::get_stored_is_high_contrast_mode;
 use crate::helpers::statuses::{get_guess_statuses, CharStatus};
 use yew::prelude::*;
 
@@ -45,7 +44,19 @@ pub fn cell(props: &CellProps) -> Html {
     let is_filled = value.is_some() && !is_completed;
     let should_reveal = is_revealing && is_completed;
     let animation_delay = format!("{}ms", position * REVEAL_TIME_MS as usize);
-    let is_high_contrast = get_stored_is_high_contrast_mode();
+
+    let state_class = match status {
+        None => {
+            if value.is_some() {
+                "cell-filled"
+            } else {
+                "cell-empty"
+            }
+        }
+        Some(CharStatus::Correct) => "correct shadowed",
+        Some(CharStatus::Present) => "present shadowed",
+        Some(CharStatus::Absent) => "absent shadowed",
+    };
 
     let cell_classes = classes!(
         "xxshort:w-11",
@@ -64,42 +75,8 @@ pub fn cell(props: &CellProps) -> Html {
         "text-4xl",
         "font-bold",
         "rounded",
-        "dark:text-white",
-        if status.is_none() {
-            "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-600"
-        } else {
-            ""
-        },
-        if value.is_some() && status.is_none() {
-            "border-black dark:border-slate-100"
-        } else {
-            ""
-        },
-        if status == Some(CharStatus::Absent) {
-            "absent shadowed bg-slate-400 dark:bg-slate-700 text-white border-slate-400 dark:border-slate-700"
-        } else {
-            ""
-        },
-        if status == Some(CharStatus::Correct) && is_high_contrast {
-            "correct shadowed bg-orange-500 text-white border-orange-500"
-        } else {
-            ""
-        },
-        if status == Some(CharStatus::Present) && is_high_contrast {
-            "present shadowed bg-cyan-500 text-white border-cyan-500"
-        } else {
-            ""
-        },
-        if status == Some(CharStatus::Correct) && !is_high_contrast {
-            "correct shadowed bg-green-500 text-white border-green-500"
-        } else {
-            ""
-        },
-        if status == Some(CharStatus::Present) && !is_high_contrast {
-            "present shadowed bg-yellow-500 text-white border-yellow-500"
-        } else {
-            ""
-        },
+        "cell",
+        state_class,
         if is_filled { "cell-fill-animation" } else { "" },
         if should_reveal { "cell-reveal" } else { "" }
     );

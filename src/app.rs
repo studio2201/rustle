@@ -192,13 +192,35 @@ pub fn app() -> Html {
         })
     };
 
+    let on_theme_click = {
+        let state = state.clone();
+        Callback::from(move |_| {
+            let next_theme = match state.theme.as_str() {
+                "light" => "dark",
+                "dark" => "nord",
+                "nord" => "dracula",
+                "dracula" => "sepia",
+                _ => "light",
+            };
+            state.dispatch(Action::SetTheme(next_theme.to_string()));
+            crate::helpers::local_storage::save_preferences_to_local_storage(
+                &crate::helpers::local_storage::StoredPreferences {
+                    theme: next_theme.to_string(),
+                    is_hard_mode: state.is_hard_mode,
+                },
+            );
+        })
+    };
+
     html! {
-        <div class="flex h-screen flex-col justify-between bg-white dark:bg-slate-900 transition-colors duration-300">
+        <div class="flex h-screen flex-col justify-between app-container transition-colors duration-300">
             <Navbar
                 on_info_click={ { let s = state.clone(); Callback::from(move |_| s.dispatch(Action::SetInfoOpen(true))) } }
                 on_stats_click={ { let s = state.clone(); Callback::from(move |_| s.dispatch(Action::SetStatsOpen(true))) } }
                 on_date_click={ { let s = state.clone(); Callback::from(move |_| s.dispatch(Action::SetDatePickerOpen(true))) } }
                 on_settings_click={ { let s = state.clone(); Callback::from(move |_| s.dispatch(Action::SetSettingsOpen(true))) } }
+                theme={state.theme.clone()}
+                on_theme_click={on_theme_click}
             />
             <Alert message={state.alert_msg.clone()} is_visible={state.alert_visible} variant={state.alert_variant.clone()} />
             <div class="mx-auto flex w-full max-w-7xl flex-grow flex-col justify-between px-1 py-2 sm:px-6 lg:px-8">

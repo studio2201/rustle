@@ -118,24 +118,17 @@ const PREFERENCES_KEY: &str = "userPreferences";
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
 pub struct StoredPreferences {
-    pub is_dark_mode: bool,
-    pub is_high_contrast: bool,
+    pub theme: String,
     pub is_hard_mode: bool,
-    #[serde(default)]
-    pub is_military_theme: bool,
 }
 
 pub fn save_preferences_to_local_storage(prefs: &StoredPreferences) {
     let _ = LocalStorage::set(PREFERENCES_KEY, prefs);
-    if prefs.is_high_contrast {
-        let _ = LocalStorage::set(HIGH_CONTRAST_KEY, "1");
-    } else {
-        LocalStorage::delete(HIGH_CONTRAST_KEY);
-    }
+    let _ = LocalStorage::delete(HIGH_CONTRAST_KEY);
     #[cfg(target_arch = "wasm32")]
     if let Some(win) = web_sys::window() {
         if let Ok(Some(storage)) = win.local_storage() {
-            let _ = storage.set_item("theme", if prefs.is_dark_mode { "dark" } else { "light" });
+            let _ = storage.set_item("theme", &prefs.theme);
             let _ = storage.set_item(
                 "gameMode",
                 if prefs.is_hard_mode { "hard" } else { "normal" },
@@ -145,22 +138,40 @@ pub fn save_preferences_to_local_storage(prefs: &StoredPreferences) {
 }
 
 pub fn load_preferences_from_local_storage(prefers_dark: bool) -> StoredPreferences {
-    if let Ok(prefs) = LocalStorage::get::<StoredPreferences>(PREFERENCES_KEY) {
-        return prefs;
+    #[derive(Deserialize)]
+    struct LegacyPreferences {
+        theme: Option<String>,
+        is_dark_mode: Option<bool>,
+        is_high_contrast: Option<bool>,
+        is_hard_mode: Option<bool>,
+        is_military_theme: Option<bool>,
     }
 
-    let is_high_contrast = get_stored_is_high_contrast_mode();
+    if let Ok(legacy) = LocalStorage::get::<LegacyPreferences>(PREFERENCES_KEY) {
+        let theme = if let Some(t) = legacy.theme {
+            t
+        } else if legacy.is_military_theme.unwrap_or(false) {
+            "nord".to_string()
+        } else if legacy.is_high_contrast.unwrap_or(false) {
+            "nord".to_string()
+        } else if legacy.is_dark_mode.unwrap_or(prefers_dark) {
+            "dark".to_string()
+        } else {
+            "light".to_string()
+        };
+        let is_hard_mode = legacy.is_hard_mode.unwrap_or(false);
+        return StoredPreferences { theme, is_hard_mode };
+    }
+
     #[allow(unused_mut)]
-    let mut is_dark_mode = prefers_dark;
+    let mut theme = if prefers_dark { "dark".to_string() } else { "light".to_string() };
     #[allow(unused_mut)]
     let mut is_hard_mode = false;
-    #[allow(unused_mut)]
-    let mut is_military_theme = false;
     #[cfg(target_arch = "wasm32")]
     if let Some(win) = web_sys::window() {
         if let Ok(Some(storage)) = win.local_storage() {
             if let Ok(Some(val)) = storage.get_item("theme") {
-                is_dark_mode = val == "dark";
+                theme = val;
             }
             if let Ok(Some(val)) = storage.get_item("gameMode") {
                 is_hard_mode = val == "hard";
@@ -168,14 +179,7 @@ pub fn load_preferences_from_local_storage(prefers_dark: bool) -> StoredPreferen
         }
     }
     StoredPreferences {
-        is_dark_mode,
-        is_high_contrast,
+        theme,
         is_hard_mode,
-        is_military_theme,
     }
-}
-
-pub fn get_stored_is_high_contrast_mode() -> bool {
-    let val: Result<String, _> = LocalStorage::get(HIGH_CONTRAST_KEY);
-    val.map(|v| v == "1").unwrap_or(false)
 }

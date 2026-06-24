@@ -36,10 +36,8 @@ pub struct AppState {
     pub is_datepicker_open: bool,
     pub is_migrate_open: bool,
     pub game_stats: GameStats,
-    pub is_dark_mode: bool,
-    pub is_high_contrast: bool,
+    pub theme: String,
     pub is_hard_mode: bool,
-    pub is_military_theme: bool,
 }
 
 pub enum Action {
@@ -60,9 +58,7 @@ pub enum Action {
     SetMigrateOpen(bool),
     SetGameStats(GameStats),
     SetHardMode(bool),
-    SetDarkMode(bool),
-    SetHighContrast(bool),
-    SetMilitaryTheme(bool),
+    SetTheme(String),
 }
 
 impl Reducible for AppState {
@@ -124,14 +120,8 @@ impl Reducible for AppState {
             Action::SetHardMode(val) => {
                 state.is_hard_mode = val;
             }
-            Action::SetDarkMode(val) => {
-                state.is_dark_mode = val;
-            }
-            Action::SetHighContrast(val) => {
-                state.is_high_contrast = val;
-            }
-            Action::SetMilitaryTheme(val) => {
-                state.is_military_theme = val;
+            Action::SetTheme(val) => {
+                state.theme = val;
             }
         }
         Rc::new(state)
@@ -158,10 +148,8 @@ impl AppState {
 
         let prefs =
             crate::helpers::local_storage::load_preferences_from_local_storage(prefers_dark);
-        let is_dark_mode = prefs.is_dark_mode;
+        let theme = prefs.theme;
         let is_hard_mode = prefs.is_hard_mode;
-        let is_high_contrast = prefs.is_high_contrast;
-        let is_military_theme = prefs.is_military_theme;
 
         let game_stats = crate::helpers::stats::load_stats();
 
@@ -181,10 +169,8 @@ impl AppState {
             is_datepicker_open: false,
             is_migrate_open: false,
             game_stats,
-            is_dark_mode,
-            is_high_contrast,
+            theme,
             is_hard_mode,
-            is_military_theme,
         }
     }
 }
