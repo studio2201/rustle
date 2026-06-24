@@ -1,4 +1,4 @@
-// Copyright (C) 2026 Jeryd
+// Copyright (C) 2026 UberMetroid
 //
 // This file is part of Rustle.
 //
