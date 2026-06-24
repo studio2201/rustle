@@ -7,10 +7,9 @@ RUN rustup target add wasm32-unknown-unknown
 # Download and install precompiled musl Trunk
 RUN wget -qO- "https://github.com/trunk-rs/trunk/releases/download/v0.21.14/trunk-x86_64-unknown-linux-musl.tar.gz" | tar -xzf- -C /usr/local/bin
 
-# Download standalone tailwindcss CLI (using the musl build for Alpine compatibility)
-RUN curl -sLO https://github.com/tailwindlabs/tailwindcss/releases/download/v3.4.17/tailwindcss-linux-x64-musl && \
-    chmod +x tailwindcss-linux-x64-musl && \
-    mv tailwindcss-linux-x64-musl /usr/local/bin/tailwindcss
+# Install Node.js, npm, and Tailwind CSS CLI for Alpine compatibility
+RUN apk add --no-cache nodejs npm && \
+    npm install -g tailwindcss@3.4.17
 
 COPY . .
 WORKDIR /app/frontend
