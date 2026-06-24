@@ -35,6 +35,7 @@ features = [
   "Window",
   "Document",
   "Element",
+  "Node",
   "DomTokenList",
   "HtmlElement",
   "HtmlInputElement",

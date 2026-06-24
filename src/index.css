@@ -785,3 +785,185 @@ body {
   --modal-desc: #819bcf;
   --modal-border: #2b3b5c;
 }
+
+/* --- WEATHER CONTAINER & PARTICLE LAYERS --- */
+#weather-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.particle {
+  position: absolute;
+  pointer-events: none;
+  will-change: transform, opacity;
+}
+
+/* 1. Crateria Rain */
+.rain-drop {
+  width: 1.5px;
+  height: 40px;
+  background: linear-gradient(transparent, rgba(165, 243, 252, 0.6));
+  animation: fall linear infinite;
+}
+@keyframes fall {
+  0% { transform: translateY(-100px) rotate(15deg); opacity: 0; }
+  10% { opacity: 0.8; }
+  90% { opacity: 0.8; }
+  100% { transform: translateY(105vh) rotate(15deg); opacity: 0; }
+}
+
+/* 2. Norfair Embers */
+.ember {
+  border-radius: 50%;
+  background: radial-gradient(circle, #f97316 0%, #ef4444 60%, transparent 100%);
+  box-shadow: 0 0 10px #f97316, 0 0 20px #ef4444;
+  animation: rise-ember ease-in-out infinite;
+}
+@keyframes rise-ember {
+  0% { transform: translateY(0) scale(0.6) translateX(0); opacity: 0; }
+  10% { opacity: 0.9; }
+  50% { transform: translateY(-50vh) scale(1.1) translateX(40px); }
+  90% { opacity: 0.8; }
+  100% { transform: translateY(-110vh) scale(0.5) translateX(-40px); opacity: 0; }
+}
+
+/* 3. Maridia Bubbles */
+.bubble {
+  border-radius: 50%;
+  border: 1px solid rgba(45, 212, 191, 0.4);
+  background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.15) 0%, rgba(45, 212, 191, 0.05) 70%, rgba(45, 212, 191, 0.2) 100%);
+  box-shadow: inset 0 0 6px rgba(255, 255, 255, 0.2);
+  animation: rise-bubble ease-in-out infinite;
+}
+@keyframes rise-bubble {
+  0% { transform: translateY(0) translateX(0); opacity: 0; }
+  10% { opacity: 0.7; }
+  50% { transform: translateY(-50vh) translateX(-20px) scale(1.05); }
+  100% { transform: translateY(-110vh) translateX(20px) scale(0.9); opacity: 0; }
+}
+
+/* 4. Tourian Spores */
+.spore {
+  border-radius: 50%;
+  background: rgba(34, 197, 94, 0.2);
+  border: 1px solid rgba(34, 197, 94, 0.5);
+  box-shadow: 0 0 8px rgba(34, 197, 94, 0.3);
+  animation: float-spore ease-in-out infinite;
+}
+@keyframes float-spore {
+  0% { transform: translateY(-10vh) translateX(0) scale(0.7); opacity: 0; }
+  10% { opacity: 0.8; }
+  50% { transform: translateY(50vh) translateX(30px) scale(1); }
+  90% { opacity: 0.6; }
+  100% { transform: translateY(105vh) translateX(-30px) scale(0.8); opacity: 0; }
+}
+
+/* 5. Christmas Snow */
+.snowflake {
+  border-radius: 50%;
+  background: white;
+  opacity: 0.8;
+  animation: drift-snow linear infinite;
+}
+@keyframes drift-snow {
+  0% { transform: translateY(-10px) translateX(0); }
+  50% { transform: translateY(50vh) translateX(20px); }
+  100% { transform: translateY(105vh) translateX(-20px); }
+}
+
+/* 6. Valentine Hearts */
+.heart-particle {
+  font-size: 16px;
+  user-select: none;
+  animation: float-heart ease-in-out infinite;
+}
+@keyframes float-heart {
+  0% { transform: translateY(100vh) scale(0.5) rotate(0deg); opacity: 0; }
+  15% { opacity: 0.8; }
+  90% { opacity: 0.8; }
+  100% { transform: translateY(-10vh) scale(1.2) rotate(15deg); opacity: 0; }
+}
+
+/* 7. Autumn Leaves (Thanksgiving) */
+.leaf-particle {
+  font-size: 18px;
+  user-select: none;
+  animation: fall-leaf linear infinite;
+}
+@keyframes fall-leaf {
+  0% { transform: translateY(-5vh) rotate(0deg) translateX(0); opacity: 0; }
+  10% { opacity: 0.8; }
+  50% { transform: translateY(50vh) rotate(180deg) translateX(40px); }
+  100% { transform: translateY(105vh) rotate(360deg) translateX(-40px); opacity: 0; }
+}
+
+/* 8. Halloween Bats/Ghosts */
+.spooky-particle {
+  font-size: 20px;
+  user-select: none;
+  animation: fly-spooky ease-in-out infinite;
+}
+@keyframes fly-spooky {
+  0% { transform: translateY(-10vh) translateX(0) scale(0.8); opacity: 0; }
+  15% { opacity: 0.8; }
+  50% { transform: translateY(50vh) translateX(-50px) scale(1.2); }
+  100% { transform: translateY(105vh) translateX(50px) scale(0.9); opacity: 0; }
+}
+
+/* 9. Celebration Confetti (New Year) */
+.confetti-particle {
+  width: 8px;
+  height: 12px;
+  animation: drift-confetti linear infinite;
+}
+@keyframes drift-confetti {
+  0% { transform: translateY(-10px) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(105vh) rotate(720deg); opacity: 0.2; }
+}
+
+/* 10. Star Sparkles (Independence) */
+.sparkle-particle {
+  font-size: 14px;
+  animation: fall-sparkle ease-in-out infinite;
+}
+@keyframes fall-sparkle {
+  0% { transform: translateY(-5vh) scale(0.2); opacity: 0; }
+  50% { opacity: 1; transform: translateY(50vh) scale(1.2); text-shadow: 0 0 8px gold; }
+  100% { transform: translateY(105vh) scale(0.5); opacity: 0; }
+}
+
+/* 11. Brinstar Pollen */
+.pollen-particle {
+  border-radius: 50%;
+  background: #a3e635;
+  box-shadow: 0 0 6px #a3e635;
+  animation: drift-pollen ease-in-out infinite;
+}
+@keyframes drift-pollen {
+  0% { transform: translateY(-5vh) translateX(0) scale(0.5); opacity: 0; }
+  10% { opacity: 0.9; }
+  50% { transform: translateY(50vh) translateX(25px) scale(0.9); }
+  100% { transform: translateY(105vh) translateX(-25px) scale(0.5); opacity: 0; }
+}
+
+/* 12. Wrecked Ship Wisps */
+.wisp-particle {
+  border-radius: 50%;
+  background: radial-gradient(circle, #06b6d4 0%, rgba(217, 70, 239, 0.4) 70%, transparent 100%);
+  box-shadow: 0 0 8px #06b6d4, 0 0 16px #d946ef;
+  animation: float-wisp ease-in-out infinite;
+}
+@keyframes float-wisp {
+  0% { transform: translateY(0) scale(0.6) translateX(0); opacity: 0; }
+  20% { opacity: 0.8; }
+  50% { transform: translateY(-50vh) scale(1.1) translateX(-30px); }
+  80% { opacity: 0.8; }
+  100% { transform: translateY(-110vh) scale(0.4) translateX(30px); opacity: 0; }
+}
+

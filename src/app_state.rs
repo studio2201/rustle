@@ -37,6 +37,7 @@ pub struct AppState {
     pub game_stats: GameStats,
     pub theme: String,
     pub is_hard_mode: bool,
+    pub is_effects_active: bool,
 }
 
 pub enum Action {
@@ -57,6 +58,8 @@ pub enum Action {
     SetGameStats(GameStats),
     SetHardMode(bool),
     SetTheme(String),
+    SetEffectsActive(bool),
+    DeactivateEffects,
 }
 
 impl Reducible for AppState {
@@ -118,6 +121,14 @@ impl Reducible for AppState {
             Action::SetTheme(val) => {
                 state.theme = val;
             }
+            Action::SetEffectsActive(val) => {
+                state.is_effects_active = val;
+            }
+            Action::DeactivateEffects => {
+                if !state.is_game_won {
+                    state.is_effects_active = false;
+                }
+            }
         }
         Rc::new(state)
     }
@@ -147,6 +158,7 @@ impl AppState {
         let is_hard_mode = prefs.is_hard_mode;
 
         let game_stats = crate::helpers::stats::load_stats();
+        let is_effects_active = is_game_won;
 
         Self {
             guesses,
@@ -165,6 +177,7 @@ impl AppState {
             game_stats,
             theme,
             is_hard_mode,
+            is_effects_active,
         }
     }
 }

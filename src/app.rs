@@ -25,6 +25,7 @@ use crate::components::app_modals::AppModals;
 use crate::components::grid::Grid;
 use crate::components::keyboard::Keyboard;
 use crate::components::navbar::Navbar;
+use crate::components::WeatherContainer;
 use crate::constants::config::*;
 use yew::prelude::*;
 
@@ -163,31 +164,55 @@ pub fn app() -> Html {
                         ALERT_TIME_MS,
                     ));
                     state_won.dispatch(Action::SetStatsOpen(true));
+                    state_won.dispatch(Action::SetEffectsActive(true));
                 })
                 .forget();
-            } else if new_guesses.len() >= MAX_CHALLENGES {
-                state.dispatch(Action::SetLost(true));
-                state.dispatch(Action::SetGameStats(
-                    crate::helpers::stats::add_stats_for_completed_game(
-                        state.game_stats.clone(),
-                        new_guesses.len(),
-                    ),
-                ));
+            } else {
+                if new_guesses.len() >= MAX_CHALLENGES {
+                    state.dispatch(Action::SetLost(true));
+                    state.dispatch(Action::SetGameStats(
+                        crate::helpers::stats::add_stats_for_completed_game(
+                            state.game_stats.clone(),
+                            new_guesses.len(),
+                        ),
+                    ));
 
-                let state_lost = state.clone();
-                let show_alert_clone = show_alert.clone();
-                gloo_timers::callback::Timeout::new(
-                    REVEAL_TIME_MS * (sol_len as u32 + 1),
-                    move || {
-                        show_alert_clone.emit((
-                            correct_word_message(solution),
-                            "error".to_string(),
-                            LONG_ALERT_TIME_MS,
-                        ));
-                        state_lost.dispatch(Action::SetStatsOpen(true));
-                    },
-                )
-                .forget();
+                    let state_lost = state.clone();
+                    let show_alert_clone = show_alert.clone();
+                    gloo_timers::callback::Timeout::new(
+                        REVEAL_TIME_MS * (sol_len as u32 + 1),
+                        move || {
+                            show_alert_clone.emit((
+                                correct_word_message(solution),
+                                "error".to_string(),
+                                LONG_ALERT_TIME_MS,
+                            ));
+                            state_lost.dispatch(Action::SetStatsOpen(true));
+                        },
+                    )
+                    .forget();
+                } else {
+                    let mut has_correct_letter = false;
+                    let sol_chars: Vec<char> = solution.chars().collect();
+                    for (i, c) in word.chars().enumerate() {
+                        if Some(c) == sol_chars.get(i).copied() {
+                            has_correct_letter = true;
+                            break;
+                        }
+                    }
+                    if has_correct_letter {
+                        let state_correct = state.clone();
+                        gloo_timers::callback::Timeout::new(REVEAL_TIME_MS * sol_len as u32, move || {
+                            state_correct.dispatch(Action::SetEffectsActive(true));
+                            let state_deactivate = state_correct.clone();
+                            gloo_timers::callback::Timeout::new(3000, move || {
+                                state_deactivate.dispatch(Action::DeactivateEffects);
+                            })
+                            .forget();
+                        })
+                        .forget();
+                    }
+                }
             }
         })
     };
@@ -252,6 +277,7 @@ pub fn app() -> Html {
 
     html! {
         <div class="flex h-screen h-dvh flex-col app-container transition-colors duration-300">
+            <WeatherContainer theme={state.theme.clone()} is_active={state.is_effects_active} />
             <Navbar
                 on_info_click={ { let s = state.clone(); Callback::from(move |_| s.dispatch(Action::SetInfoOpen(true))) } }
                 on_stats_click={ { let s = state.clone(); Callback::from(move |_| s.dispatch(Action::SetStatsOpen(true))) } }

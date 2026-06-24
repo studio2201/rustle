@@ -33,6 +33,7 @@ pub mod keyboard;
 pub mod navbar;
 pub mod stat_bar;
 pub mod stat_histogram;
+pub mod weather;
 
 // Modal components split into individual modular modules.
 pub mod modal_base;
@@ -48,3 +49,4 @@ pub use modal_date_picker::DatePickerModal;
 pub use modal_info::InfoModal;
 pub use modal_migrate::MigrateStatsModal;
 pub use modal_stats::StatsModal;
+pub use weather::WeatherContainer;
