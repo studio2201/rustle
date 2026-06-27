@@ -118,7 +118,16 @@ pub fn key_btn(props: &KeyProps) -> Html {
     html! {
         <button
             style={style}
-            aria-label={format!("{}{}", value, status.map(|s| format!(" {:?}", s)).unwrap_or_default())}
+            aria-label={
+                let state = match status {
+                    None => String::new(),
+                    Some(CharStatus::Correct) => ", correct".to_string(),
+                    Some(CharStatus::Present) => ", present in word".to_string(),
+                    Some(CharStatus::Absent) => ", not in word".to_string(),
+                };
+                format!("{key}{state}", key = value)
+            }
+            aria-pressed={status.is_some()}
             class={key_classes}
             onclick={click_handler}
         >

@@ -55,8 +55,11 @@ pub fn alert(props: &AlertProps) -> Html {
         }
     );
 
+    // `role="status"` + `aria-live="polite"` makes the alert announce itself
+    // to screen readers without interrupting other content. `aria-atomic`
+    // ensures the full message is read, not just the changed portion.
     html! {
-        <div class={classes}>
+        <div class={classes} role="status" aria-live="polite" aria-atomic="true">
             <div class="p-2">
                 <p class="text-center text-sm font-medium">{props.message.clone()}</p>
             </div>

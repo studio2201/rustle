@@ -18,7 +18,11 @@
 #![allow(dead_code)]
 
 //! Configuration parameters and localized strings.
-//! Consolidates application rules, alerts timing, cryptographic keys, and UI text elements.
+//! Consolidates application rules, alerts timing, obfuscation keys, and UI text elements.
+//!
+//! Note: the prior `BLOWFISH_KEY` constant was renamed to
+//! `STATS_MIGRATION_OBFUSCATION_KEY` because the variable name implied
+//! security that the constant does not provide (see its doc comment).
 // Game parameters
 pub const MAX_CHALLENGES: usize = 6;
 pub const ALERT_TIME_MS: u32 = 2000;
@@ -27,7 +31,20 @@ pub const REVEAL_TIME_MS: u32 = 350;
 pub const WELCOME_INFO_MODAL_MS: u32 = 350;
 pub const DISCOURAGE_INAPP_BROWSERS: bool = true;
 pub const ENABLE_MIGRATE_STATS: bool = true;
-pub const BLOWFISH_KEY: &str = "xcQUAHsik#Thq&LG*8es2DsZ$3bw^e";
+/// Obfuscation key used when migrating statistics between devices.
+///
+/// This is **obfuscation, not security**: the constant is part of the
+/// Rustle source code and is shipped to every browser that runs the game.
+/// Anyone with the source (or a packed WASM blob) can recover the
+/// "encrypted" stats. The value exists so that naïve local-storage scrapers
+/// don't accidentally produce valid plaintext for transport formats that
+/// expect binary data, and so that the migration payload is not a trivially
+/// editable string in DevTools.
+///
+/// Do not use this constant for any purpose that requires confidentiality
+/// or authenticity. If you need real cryptography, use the WebCrypto API
+/// with a key the user actually owns.
+pub const STATS_MIGRATION_OBFUSCATION_KEY: &str = "xcQUAHsik#Thq&LG*8es2DsZ$3bw^e";
 pub const ENABLE_ARCHIVED_GAMES: bool = false;
 pub const GAME_TITLE: &str = "Rustle";
 

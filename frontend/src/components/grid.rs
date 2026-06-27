@@ -92,7 +92,12 @@ pub fn cell(props: &CellProps) -> Html {
     );
 
     html! {
-        <div class={cell_classes} style={delay_style.clone()}>
+        <div
+            class={cell_classes}
+            style={delay_style.clone()}
+            role="gridcell"
+            aria-label={value.map(|c| c.to_string()).unwrap_or_else(|| "empty".to_string())}
+        >
             <div class="letter-container" style={delay_style}>
                 {if let Some(c) = value { html! { {c} } } else { html! {} }}
             </div>
@@ -111,8 +116,34 @@ pub struct CompletedRowProps {
 pub fn completed_row(props: &CompletedRowProps) -> Html {
     let statuses = get_guess_statuses(&props.solution, &props.guess);
 
+    // Build a row summary that screen readers can announce when the
+    // reveal animation finishes. Example: "GAME: 1 correct, 1 present,
+    // 3 absent".
+    let row_summary = {
+        let correct = statuses
+            .iter()
+            .filter(|s| **s == CharStatus::Correct)
+            .count();
+        let present = statuses
+            .iter()
+            .filter(|s| **s == CharStatus::Present)
+            .count();
+        let absent = statuses
+            .iter()
+            .filter(|s| **s == CharStatus::Absent)
+            .count();
+        format!(
+            "{}: {} correct, {} present, {} absent",
+            props.guess, correct, present, absent
+        )
+    };
+
     html! {
-        <div class="flex justify-center mb-1">
+        <div
+            class="flex justify-center mb-1"
+            role="row"
+            aria-label={row_summary}
+        >
             {for props.guess.chars().enumerate().map(|(i, val)| {
                 html! {
                     <Cell
@@ -140,7 +171,11 @@ pub fn current_row(props: &CurrentRowProps) -> Html {
     let empties_count = 5 - guess_len.min(5);
 
     html! {
-        <div class={classes!("flex", "justify-center", "mb-1", props.class_name.clone())}>
+        <div
+            class={classes!("flex", "justify-center", "mb-1", props.class_name.clone())}
+            role="row"
+            aria-label={format!("Current guess: {}{}", props.guess, "_".repeat(empties_count))}
+        >
             {for props.guess.chars().map(|val| {
                 html! { <Cell value={Some(val)} /> }
             })}
@@ -154,7 +189,7 @@ pub fn current_row(props: &CurrentRowProps) -> Html {
 #[function_component(EmptyRow)]
 pub fn empty_row() -> Html {
     html! {
-        <div class="flex justify-center mb-1">
+        <div class="flex justify-center mb-1" role="row" aria-label="empty row">
             {for (0..5).map(|_| html! { <Cell /> })}
         </div>
     }
@@ -175,7 +210,12 @@ pub fn grid(props: &GridProps) -> Html {
     let empties_count = (MAX_CHALLENGES - 1).saturating_sub(guesses_len);
 
     html! {
-        <div id="game-grid" class="flex flex-col justify-center mt-8 sm:mt-0 pb-1 sm:pb-2">
+        <div
+            id="game-grid"
+            class="flex flex-col justify-center mt-8 sm:mt-0 pb-1 sm:pb-2"
+            role="grid"
+            aria-label="Guess grid"
+        >
             {for props.guesses.iter().enumerate().map(|(i, g)| {
                 html! {
                     <CompletedRow
