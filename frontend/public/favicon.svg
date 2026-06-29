@@ -1,34 +1,17 @@
-<?xml version="1.0" encoding="utf-8"?>
-<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-	 viewBox="0 0 512 512" style="enable-background:new 0 0 512 512;" xml:space="preserve">
-<g>
-	<circle cx="256" cy="256" r="232.7" style="opacity:0.2;fill:#e05d44;enable-background:new;"/>
-	<path style="fill:#e05d44;" d="M256,512C114.8,512,0,397.2,0,256S114.8,0,256,0s256,114.8,256,256S397.2,512,256,512z M256,46.6
-		c-115.5,0-209.5,94-209.5,209.5s94,209.5,209.5,209.5s209.5-94,209.5-209.5C465.5,140.5,371.5,46.6,256,46.6z"/>
-	<g>
-		<!-- Row 1 -->
-		<rect x="150" y="150" width="50" height="50" rx="6" style="opacity:0.9;fill:#e05d44;enable-background:new;"/>
-		<rect x="204" y="150" width="50" height="50" rx="6" style="opacity:0.7;fill:#e05d44;enable-background:new;"/>
-		<rect x="258" y="150" width="50" height="50" rx="6" style="opacity:0.9;fill:#e05d44;enable-background:new;"/>
-		<rect x="312" y="150" width="50" height="50" rx="6" style="opacity:0.7;fill:#e05d44;enable-background:new;"/>
-		
-		<!-- Row 2 -->
-		<rect x="150" y="204" width="50" height="50" rx="6" style="opacity:0.7;fill:#e05d44;enable-background:new;"/>
-		<rect x="204" y="204" width="50" height="50" rx="6" style="opacity:0.9;fill:#e05d44;enable-background:new;"/>
-		<rect x="258" y="204" width="50" height="50" rx="6" style="opacity:0.7;fill:#e05d44;enable-background:new;"/>
-		<rect x="312" y="204" width="50" height="50" rx="6" style="opacity:0.9;fill:#e05d44;enable-background:new;"/>
-		
-		<!-- Row 3 -->
-		<rect x="150" y="258" width="50" height="50" rx="6" style="opacity:0.9;fill:#e05d44;enable-background:new;"/>
-		<rect x="204" y="258" width="50" height="50" rx="6" style="opacity:0.9;fill:#e05d44;enable-background:new;"/>
-		<rect x="258" y="258" width="50" height="50" rx="6" style="opacity:0.9;fill:#e05d44;enable-background:new;"/>
-		<rect x="312" y="258" width="50" height="50" rx="6" style="opacity:0.9;fill:#e05d44;enable-background:new;"/>
-		
-		<!-- Row 4 -->
-		<rect x="150" y="312" width="50" height="50" rx="6" style="opacity:0.3;fill:#e05d44;enable-background:new;"/>
-		<rect x="204" y="312" width="50" height="50" rx="6" style="opacity:0.3;fill:#e05d44;enable-background:new;"/>
-		<rect x="258" y="312" width="50" height="50" rx="6" style="opacity:0.3;fill:#e05d44;enable-background:new;"/>
-		<rect x="312" y="312" width="50" height="50" rx="6" style="opacity:0.3;fill:#e05d44;enable-background:new;"/>
-	</g>
-</g>
+<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" viewBox="0 0 512 512">
+  <circle cx="256" cy="256" r="232.7" style="opacity:.2;fill:#e05d44"/>
+  <path d="M256 512C114.8 512 0 397.2 0 256S114.8 0 256 0s256 114.8 256 256-114.8 256-256 256m0-465.4c-115.5 0-209.5 94-209.5 209.5s94 209.5 209.5 209.5 209.5-94 209.5-209.5c0-115.6-94-209.5-209.5-209.5" style="fill:#e05d44"/>
+  <g style="fill:none;stroke:#e05d44;stroke-width:16;stroke-linecap:round;stroke-linejoin:round">
+    <rect x="140" y="140" width="60" height="60" rx="8" style="fill:#e05d44;fill-opacity:0.2"/>
+    <rect x="226" y="140" width="60" height="60" rx="8" style="fill:#e05d44;fill-opacity:0.5"/>
+    <rect x="312" y="140" width="60" height="60" rx="8" style="fill:#e05d44"/>
+    
+    <rect x="140" y="226" width="60" height="60" rx="8" style="fill:#e05d44"/>
+    <rect x="226" y="226" width="60" height="60" rx="8" style="fill:#e05d44;fill-opacity:0.2"/>
+    <rect x="312" y="226" width="60" height="60" rx="8" style="fill:#e05d44;fill-opacity:0.5"/>
+
+    <rect x="140" y="312" width="60" height="60" rx="8" style="fill:#e05d44;fill-opacity:0.5"/>
+    <rect x="226" y="312" width="60" height="60" rx="8" style="fill:#e05d44"/>
+    <rect x="312" y="312" width="60" height="60" rx="8" style="fill:#e05d44;fill-opacity:0.2"/>
+  </g>
 </svg>
