@@ -18,9 +18,9 @@
 //! Rustle App view coordinator.
 //! Coordinates layout structure, handles user key input, and manages game status alerts.
 
+pub mod callbacks;
 pub mod enter;
 pub mod init;
-pub mod callbacks;
 
 use crate::app_effects::use_app_effects;
 use crate::app_state::{Action, AppState};
@@ -29,7 +29,7 @@ use crate::components::grid::Grid;
 use crate::components::keyboard::Keyboard;
 use crate::components::WeatherContainer;
 use crate::constants::config::*;
-use shared_frontend::{Header, Footer};
+use shared_frontend::{Footer, Header};
 use yew::prelude::*;
 
 #[function_component(App)]
@@ -57,7 +57,7 @@ pub fn app() -> Html {
     let enable_themes = use_state(|| true);
     let enable_print = use_state(|| true);
     let language_state = use_state(crate::i18n::get_saved_language);
- 
+
     {
         let is_pin_required = is_pin_required.clone();
         let enable_translation = enable_translation.clone();

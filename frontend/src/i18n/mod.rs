@@ -37,19 +37,6 @@ impl Language {
         }
     }
 
-    pub fn label(self) -> &'static str {
-        match self {
-            Self::English => "English",
-            Self::Chinese => "简体中文",
-            Self::Spanish => "Español",
-            Self::German => "Deutsch",
-            Self::Japanese => "日本語",
-            Self::French => "Français",
-            Self::Portuguese => "Português",
-            Self::Russian => "Русский",
-        }
-    }
-
     pub fn from_code(code: &str) -> Self {
         match code {
             "zh" => Self::Chinese,
@@ -61,19 +48,6 @@ impl Language {
             "ru" => Self::Russian,
             _ => Self::English,
         }
-    }
-
-    pub fn all() -> &'static [Self] {
-        &[
-            Self::English,
-            Self::Chinese,
-            Self::Spanish,
-            Self::German,
-            Self::Japanese,
-            Self::French,
-            Self::Portuguese,
-            Self::Russian,
-        ]
     }
 }
 

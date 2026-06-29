@@ -18,7 +18,6 @@
 #![allow(unused_imports)]
 //! UI component module declarations for the Rustle application.
 //! Contains re-usable view components:
-//! - Alerts: Toast style game notifications
 //! - Grid: Wordle row and cell letter grid
 //! - Keyboard: Interactive virtual letter keyboard
 //! - Navbar: Navigation bar with action controls
@@ -26,7 +25,6 @@
 //! - Stat widgets: Isolated components for showing stats bars and histograms.
 //! - AppModals: A consolidated container of all overlay dialogs.
 
-pub mod alerts;
 pub mod app_modals;
 pub mod grid;
 pub mod keyboard;

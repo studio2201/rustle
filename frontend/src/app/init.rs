@@ -18,14 +18,18 @@ pub fn fetch_app_config(
     state: UseReducerHandle<AppState>,
 ) {
     wasm_bindgen_futures::spawn_local(async move {
-        if let Ok(resp) = gloo_net::http::Request::get("/api/pin-required").send().await {
+        if let Ok(resp) = gloo_net::http::Request::get("/api/pin-required")
+            .send()
+            .await
+        {
             if let Ok(json) = resp.json::<serde_json::Value>().await {
                 if let Some(req) = json.get("required").and_then(|v| v.as_bool()) {
                     is_pin_required.set(req);
                 }
                 if let Some(trans) = json.get("enable_translation").and_then(|v| v.as_bool()) {
                     enable_translation.set(trans);
-                } else if let Some(trans) = json.get("enableTranslation").and_then(|v| v.as_bool()) {
+                } else if let Some(trans) = json.get("enableTranslation").and_then(|v| v.as_bool())
+                {
                     enable_translation.set(trans);
                 }
 

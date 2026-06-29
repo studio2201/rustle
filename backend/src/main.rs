@@ -25,7 +25,7 @@ use auth::{
     AppState,
 };
 use handlers::{serve_asset_manifest, serve_index, serve_service_worker};
-use tracing_subscriber::{Layer, layer::SubscriberExt, util::SubscriberInitExt};
+use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt, Layer};
 
 #[tokio::main]
 async fn main() {
@@ -45,13 +45,11 @@ async fn main() {
             let _ = std::fs::create_dir_all(dir);
             let error_file = std::fs::OpenOptions::new()
                 .create(true)
-                .write(true)
                 .append(true)
                 .open(std::path::Path::new(dir).join("error.log"))
                 .ok();
             let app_file = std::fs::OpenOptions::new()
                 .create(true)
-                .write(true)
                 .append(true)
                 .open(std::path::Path::new(dir).join("app.log"))
                 .ok();
