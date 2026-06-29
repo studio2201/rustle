@@ -6,6 +6,15 @@
 
 Rustle is an optimized, responsive, and secure clone of the popular Wordle game built using Rust, Yew, and WebAssembly, served by a native Axum backend.
 
+## Features
+
+- **Standardized UI Alignment**: Completely integrated with `shared-assets` for a uniform theme engine, navigation header, footer, and authentication layout.
+- **Super Metroid Atmospheric Environments**: Selectable map location themes (Crateria, Brinstar, Norfair, Wrecked Ship, Maridia, Tourian) with custom color schemes and interactive ambient weather particle effects.
+- **Classic Gameplay Rules**: Standard Wordle guess validation, semantic green/yellow grid cell styling, high-contrast settings, and an optional hard-mode toggle.
+- **Secure PIN Access**: Optional lock screen gate with client IP rate-limiting, secure lockout memory tracking, and timing-attack protections.
+- **Multilingual Support**: Fully localized in 8 different languages (English, Chinese, Spanish, German, Japanese, French, Portuguese, Russian).
+- **Extremely Lightweight**: Compiled down to an optimized WebAssembly bundle (~779KB) with zero runtime dependencies.
+
 ---
 
 ## Container Installation
