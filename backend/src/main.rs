@@ -158,7 +158,7 @@ async fn main() {
     println!("Server running natively on http://localhost:{}", port);
 
     let listener = tokio::net::TcpListener::bind(addr).await.unwrap();
-    axum::serve(listener, app).await.unwrap();
+    axum::serve(listener, app.into_make_service_with_connect_info::<SocketAddr>()).await.unwrap();
 }
 
 fn get_cors_layer(allowed_origins_env: &str) -> tower_http::cors::CorsLayer {

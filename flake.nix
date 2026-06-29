@@ -27,7 +27,7 @@
         # 1. Build the WASM frontend & backend combined in single root
         app = rustPlatform.buildRustPackage {
           pname = "rustle";
-          version = "0.1.27";
+          version = "0.1.28";
           src = ./.;
 
           cargoLock = {
