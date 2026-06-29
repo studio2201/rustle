@@ -52,7 +52,7 @@ pub fn is_authorized(headers: &HeaderMap, pin: &str) -> bool {
         .and_then(|c_str| {
             c_str
                 .split(';')
-                .find(|s| s.trim().starts_with("RUSTLE_PIN="))
+                .find(|s| s.trim().starts_with("pin="))
                 .and_then(|s| s.split('=').nth(1))
                 .map(|s| s.trim().to_string())
         });

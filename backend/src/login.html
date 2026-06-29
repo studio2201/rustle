@@ -7,232 +7,212 @@
     <style>
         :root {
             --bg-color: #0b0f19;
-            --card-bg: rgba(17, 24, 39, 0.7);
-            --card-border: rgba(255, 255, 255, 0.08);
+            --container: rgba(17, 24, 39, 0.7);
+            --border: rgba(255, 255, 255, 0.08);
             --primary: #4f46e5;
-            --primary-hover: #4338ca;
-            --text-main: #f3f4f6;
+            --text: #f3f4f6;
             --text-muted: #9ca3af;
-            --error-color: #ef4444;
+            --danger: #ef4444;
+            --transition: 0.2s ease-in-out;
         }
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
-            font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             background-color: var(--bg-color);
-            color: var(--text-main);
+            color: var(--text);
             display: flex;
             align-items: center;
             justify-content: center;
             min-height: 100vh;
             overflow: hidden;
+        }
+        .login-container {
             position: relative;
-        }
-        body::before, body::after {
-            content: '';
-            position: absolute;
-            width: 300px;
-            height: 300px;
-            border-radius: 50%;
-            background: radial-gradient(circle, rgba(79, 70, 229, 0.15) 0%, rgba(0,0,0,0) 70%);
-            z-index: 0;
-        }
-        body::before {
-            top: 15%;
-            left: 20%;
-        }
-        body::after {
-            bottom: 15%;
-            right: 20%;
-        }
-        .container {
-            position: relative;
-            z-index: 1;
-            width: 100%;
+            width: 90%;
             max-width: 400px;
-            padding: 24px;
+            margin: 40px auto;
+            z-index: 10;
         }
-        .card {
-            background-color: var(--card-bg);
+        .login-box {
+            background: var(--container);
+            padding: 2.5rem 2rem;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
-            border: 1px solid var(--card-border);
-            border-radius: 16px;
-            padding: 32px;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
-            text-align: center;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-        .card:hover {
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.4), 0 10px 10px -5px rgba(0, 0, 0, 0.4);
-        }
-        .logo-container {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 64px;
-            height: 64px;
-            border-radius: 12px;
-            background: linear-gradient(135deg, #4f46e5 0%, #312e81 100%);
-            margin-bottom: 24px;
-            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
-        }
-        .logo-icon {
-            font-size: 28px;
-            font-weight: bold;
-            color: #ffffff;
-            letter-spacing: -1px;
-        }
-        h1 {
-            font-size: 24px;
-            font-weight: 700;
-            margin-bottom: 8px;
-            background: linear-gradient(to right, #ffffff, #9ca3af);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        p {
-            font-size: 14px;
-            color: var(--text-muted);
-            margin-bottom: 24px;
-        }
-        .input-group {
-            margin-bottom: 20px;
-            text-align: left;
-        }
-        label {
-            display: block;
-            font-size: 12px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: var(--text-muted);
-            margin-bottom: 6px;
-        }
-        input {
             width: 100%;
-            padding: 12px 16px;
-            background-color: rgba(0, 0, 0, 0.2);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 8px;
-            color: #ffffff;
-            font-size: 16px;
-            letter-spacing: 0.15em;
             text-align: center;
-            outline: none;
-            transition: border-color 0.2s ease, box-shadow 0.2s ease;
         }
-        input:focus {
+        .login-box h2 {
+            font-size: 1.5rem;
+            font-weight: 500;
+            color: var(--text);
+            opacity: 0.8;
+            margin-bottom: 2rem;
+            line-height: 1.2;
+        }
+        .pin-wrapper {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+        }
+        .pin-input-field {
+            text-align: center;
+            font-size: 2rem;
+            font-weight: 700;
+            letter-spacing: 0.5em;
+            padding: 0.75rem 1rem;
+            width: 100%;
+            max-width: 280px;
+            background: rgba(0, 0, 0, 0.2);
+            color: var(--text);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            outline: none;
+            transition: all var(--transition);
+        }
+        .pin-input-field:focus {
             border-color: var(--primary);
             box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.25);
         }
-        button {
-            width: 100%;
-            padding: 12px;
-            background-color: var(--primary);
-            color: #ffffff;
-            font-size: 16px;
+        .pin-input-field:disabled { opacity: 0.5; cursor: not-allowed; }
+        .pin-status { margin-top: 1rem; display: flex; flex-direction: column; gap: 0.75rem; }
+        .attempts-remaining {
+            color: var(--danger);
+            font-size: 0.9rem;
             font-weight: 600;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: background-color 0.2s ease, transform 0.1s ease;
-            box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.2);
+            background: rgba(239, 68, 68, 0.08);
+            padding: 0.5rem 1rem;
+            border-radius: 10px;
+            display: inline-block;
         }
-        button:hover {
-            background-color: var(--primary-hover);
+        .lockout-notice {
+            color: var(--danger);
+            font-size: 0.95rem;
+            font-weight: 600;
+            background: rgba(239, 68, 68, 0.08);
+            padding: 0.85rem 1.25rem;
+            border-radius: 12px;
+            border: 1px solid rgba(239, 68, 68, 0.2);
         }
-        button:active {
-            transform: scale(0.98);
-        }
-        .error-msg {
-            font-size: 13px;
-            color: var(--error-color);
-            margin-top: 12px;
-            min-height: 20px;
-            opacity: 0;
-            transition: opacity 0.2s ease;
-        }
-        .error-msg.visible {
-            opacity: 1;
-        }
+        .pin-error { color: var(--danger); font-size: 0.9rem; font-weight: 500; display: none; }
         @keyframes shake {
             0%, 100% { transform: translateX(0); }
             25% { transform: translateX(-6px); }
             75% { transform: translateX(6px); }
         }
-        .shake {
-            animation: shake 0.2s ease-in-out 2;
-        }
+        .shake { animation: shake 0.2s ease-in-out 2; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="card" id="loginCard">
-            <div class="logo-container">
-                <span class="logo-icon">Ru</span>
+    <div class="login-container">
+        <div class="login-box" id="loginCard">
+            <div class="pin-header">
+                <h2 id="pin-description">Enter PIN</h2>
             </div>
-            <h1>{SITE_TITLE}</h1>
-            <p>This application is protected by a PIN.</p>
-            <form id="loginForm" onsubmit="handleLogin(event)">
-                <div class="input-group">
-                    <label for="pinInput">Enter PIN</label>
-                    <input type="password" id="pinInput" maxlength="10" placeholder="••••" required autofocus autocomplete="current-password">
+            <form id="pin-form" onsubmit="handleLogin(event)">
+                <div class="pin-wrapper">
+                    <input
+                        type="password"
+                        id="pinInput"
+                        class="pin-input-field"
+                        placeholder="••••"
+                        required
+                        autofocus
+                        autocomplete="current-password"
+                    >
                 </div>
-                <button type="submit">Unlock App</button>
-                <div class="error-msg" id="errorMsg">Invalid PIN. Please try again.</div>
             </form>
+            <div class="pin-status">
+                <p id="pin-error" class="pin-error"></p>
+                <div id="attempts-box"></div>
+            </div>
         </div>
     </div>
-
     <script>
+        let pinLength = 4;
+        async function init() {
+            try {
+                const response = await fetch('/api/pin-required');
+                if (response.ok) {
+                    const data = await response.json();
+                    pinLength = data.length || 4;
+                    const pinInput = document.getElementById('pinInput');
+                    pinInput.maxLength = pinLength;
+                    pinInput.placeholder = "• ".repeat(pinLength).trim();
+                    if (data.locked) {
+                        setLockoutState(data.lockout_minutes || 15);
+                    } else {
+                        updateAttemptsRemaining(data.attempts_left);
+                    }
+                }
+            } catch (err) {
+                console.error("Failed to query PIN requirements:", err);
+            }
+        }
+        function setLockoutState(minutes) {
+            const pinInput = document.getElementById('pinInput');
+            const pinDescription = document.getElementById('pin-description');
+            const attemptsBox = document.getElementById('attempts-box');
+            const pinError = document.getElementById('pin-error');
+            pinInput.disabled = true;
+            pinDescription.textContent = "Locked Out";
+            pinError.style.display = "none";
+            attemptsBox.innerHTML = `<span class="lockout-notice">Too many attempts. Please try again in ${minutes} minutes.</span>`;
+        }
+        function updateAttemptsRemaining(attemptsLeft) {
+            const attemptsBox = document.getElementById('attempts-box');
+            if (attemptsLeft !== undefined && attemptsLeft < 5) {
+                attemptsBox.innerHTML = `<span class="attempts-remaining">${attemptsLeft} attempts remaining</span>`;
+            } else {
+                attemptsBox.innerHTML = "";
+            }
+        }
         async function handleLogin(e) {
             e.preventDefault();
             const pinInput = document.getElementById('pinInput');
-            const errorMsg = document.getElementById('errorMsg');
-            const card = document.getElementById('loginCard');
+            const pinError = document.getElementById('pin-error');
             const pin = pinInput.value.trim();
-
             if (!pin) return;
-
             try {
                 const response = await fetch('/api/verify-pin', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ pin })
                 });
-
                 const data = await response.json();
-
                 if (response.ok && data.success) {
                     window.location.reload();
                 } else {
-                    showError();
+                    if (data.locked) {
+                        setLockoutState(data.lockout_minutes || 15);
+                    } else {
+                        showError(data.error || "Invalid PIN.");
+                        updateAttemptsRemaining(data.attempts_left);
+                    }
                 }
             } catch (err) {
-                showError();
+                showError("Connection error. Please try again.");
             }
         }
-
-        function showError() {
+        function showError(msg) {
             const pinInput = document.getElementById('pinInput');
-            const errorMsg = document.getElementById('errorMsg');
+            const pinError = document.getElementById('pin-error');
             const card = document.getElementById('loginCard');
-            
-            errorMsg.classList.add('visible');
+            pinError.textContent = msg;
+            pinError.style.display = "block";
             card.classList.add('shake');
             pinInput.value = '';
             pinInput.focus();
-
-            setTimeout(() => {
-                card.classList.remove('shake');
-            }, 400);
+            setTimeout(() => card.classList.remove('shake'), 400);
         }
+        document.getElementById('pinInput').addEventListener('input', (e) => {
+            if (e.target.value.length === pinLength) {
+                handleLogin(new Event('submit'));
+            }
+        });
+        window.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
 </html>

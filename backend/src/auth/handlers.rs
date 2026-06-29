@@ -85,9 +85,7 @@ pub async fn verify_pin(
         let mut headers = HeaderMap::new();
         headers.insert(
             header::SET_COOKIE,
-            header::HeaderValue::from_static(
-                "RUSTLE_PIN=; Path=/; HttpOnly; SameSite=Strict; Max-Age=0",
-            ),
+            header::HeaderValue::from_static("pin=; Path=/; HttpOnly; SameSite=Strict; Max-Age=0"),
         );
         return (StatusCode::OK, headers, Json(json!({ "success": true }))).into_response();
     };
@@ -107,7 +105,7 @@ pub async fn verify_pin(
         headers.insert(
             header::SET_COOKIE,
             header::HeaderValue::from_str(&format!(
-                "RUSTLE_PIN={}; Path=/; HttpOnly; SameSite=Strict",
+                "pin={}; Path=/; HttpOnly; SameSite=Strict",
                 hash_pin(pin_str)
             ))
             .unwrap(),
@@ -163,9 +161,7 @@ pub async fn logout() -> impl IntoResponse {
     let mut headers = HeaderMap::new();
     headers.insert(
         header::SET_COOKIE,
-        header::HeaderValue::from_static(
-            "RUSTLE_PIN=; Path=/; HttpOnly; SameSite=Strict; Max-Age=0",
-        ),
+        header::HeaderValue::from_static("pin=; Path=/; HttpOnly; SameSite=Strict; Max-Age=0"),
     );
     (StatusCode::OK, headers, Json(json!({ "success": true }))).into_response()
 }
