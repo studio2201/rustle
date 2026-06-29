@@ -19,6 +19,8 @@
 //! Coordinates layout structure, handles user key input, and manages game status alerts.
 
 pub mod enter;
+pub mod init;
+pub mod callbacks;
 
 use crate::app_effects::use_app_effects;
 use crate::app_state::{Action, AppState};
@@ -26,9 +28,9 @@ use crate::components::alerts::Alert;
 use crate::components::app_modals::AppModals;
 use crate::components::grid::Grid;
 use crate::components::keyboard::Keyboard;
-use crate::components::navbar::Navbar;
 use crate::components::WeatherContainer;
 use crate::constants::config::*;
+use shared_frontend::Header;
 use yew::prelude::*;
 
 #[function_component(App)]
@@ -64,54 +66,13 @@ pub fn app() -> Html {
         let enable_print = enable_print.clone();
         let state = state.clone();
         use_effect_with((), move |_| {
-            wasm_bindgen_futures::spawn_local(async move {
-                if let Ok(resp) = gloo_net::http::Request::get("/api/pin-required")
-                    .send()
-                    .await
-                {
-                    if let Ok(json) = resp.json::<serde_json::Value>().await {
-                        if let Some(req) = json.get("required").and_then(|v| v.as_bool()) {
-                            is_pin_required.set(req);
-                        }
-                        if let Some(trans) =
-                            json.get("enable_translation").and_then(|v| v.as_bool())
-                        {
-                            enable_translation.set(trans);
-                        } else if let Some(trans) =
-                            json.get("enableTranslation").and_then(|v| v.as_bool())
-                        {
-                            enable_translation.set(trans);
-                        }
-
-                        let mut themes_enabled = true;
-                        if let Some(themes) =
-                            json.get("enable_themes").and_then(|v| v.as_bool())
-                        {
-                            themes_enabled = themes;
-                            enable_themes.set(themes);
-                        } else if let Some(themes) =
-                            json.get("enableThemes").and_then(|v| v.as_bool())
-                        {
-                            themes_enabled = themes;
-                            enable_themes.set(themes);
-                        }
-
-                        if !themes_enabled {
-                            state.dispatch(Action::SetTheme("tourian".to_string()));
-                        }
-
-                        if let Some(print) =
-                            json.get("enable_print").and_then(|v| v.as_bool())
-                        {
-                            enable_print.set(print);
-                        } else if let Some(print) =
-                            json.get("enablePrint").and_then(|v| v.as_bool())
-                        {
-                            enable_print.set(print);
-                        }
-                    }
-                }
-            });
+            init::fetch_app_config(
+                is_pin_required,
+                enable_translation,
+                enable_themes,
+                enable_print,
+                state,
+            );
             || ()
         });
     }
@@ -186,88 +147,66 @@ pub fn app() -> Html {
         i18n_context.clone(),
     );
 
-    let on_theme_click = {
-        let state = state.clone();
-        let enable_themes = enable_themes.clone();
-        Callback::from(move |_| {
-            if !*enable_themes {
-                return;
-            }
-            let date = crate::helpers::words::get_game_date();
-            if crate::helpers::holidays::get_holiday_for_date(date).is_some() {
-                return;
-            }
-            let next_theme = match state.theme.as_str() {
-                "crateria" => "brinstar".to_string(),
-                "brinstar" => "norfair".to_string(),
-                "norfair" => "wrecked_ship".to_string(),
-                "wrecked_ship" => "maridia".to_string(),
-                "maridia" => "tourian".to_string(),
-                _ => "crateria".to_string(),
-            };
-            state.dispatch(Action::SetTheme(next_theme.clone()));
-            crate::helpers::local_storage::save_preferences_to_local_storage(
-                &crate::helpers::local_storage::StoredPreferences {
-                    theme: next_theme,
-                    is_hard_mode: state.is_hard_mode,
-                },
-            );
-        })
-    };
-
-    let on_hard_mode_click = {
-        let state = state.clone();
-        let show_alert = show_alert.clone();
-        Callback::from(move |_| {
-            let next_val = !state.is_hard_mode;
-            if next_val {
-                if state.guesses.is_empty() {
-                    state.dispatch(Action::SetHardMode(true));
-                    crate::helpers::local_storage::save_preferences_to_local_storage(
-                        &crate::helpers::local_storage::StoredPreferences {
-                            theme: state.theme.clone(),
-                            is_hard_mode: true,
-                        },
-                    );
-                } else {
-                    show_alert.emit((
-                        HARD_MODE_ALERT_MESSAGE.to_string(),
-                        "error".to_string(),
-                        ALERT_TIME_MS,
-                    ));
-                }
-            } else {
-                state.dispatch(Action::SetHardMode(false));
-                crate::helpers::local_storage::save_preferences_to_local_storage(
-                    &crate::helpers::local_storage::StoredPreferences {
-                        theme: state.theme.clone(),
-                        is_hard_mode: false,
-                    },
-                );
-            }
-        })
-    };
+    let on_theme_click = callbacks::build_on_theme_click(state.clone(), enable_themes.clone());
+    let on_hard_mode_click = callbacks::build_on_hard_mode_click(state.clone(), show_alert.clone());
 
     html! {
         <ContextProvider<crate::i18n::I18nContext> context={i18n_context}>
             <div class="flex h-screen h-dvh flex-col app-container transition-colors duration-300">
                 <WeatherContainer theme={state.theme.clone()} is_active={state.is_effects_active} />
-                <Navbar
-                    on_info_click={ { let s = state.clone(); Callback::from(move |_| s.dispatch(Action::SetInfoOpen(true))) } }
-                    on_stats_click={ { let s = state.clone(); Callback::from(move |_| s.dispatch(Action::SetStatsOpen(true))) } }
-                    on_date_click={ { let s = state.clone(); Callback::from(move |_| s.dispatch(Action::SetDatePickerOpen(true))) } }
-                    is_hard_mode={state.is_hard_mode}
-                    on_hard_mode_click={on_hard_mode_click}
+                <Header
+                    site_title={GAME_TITLE.to_string()}
                     theme={state.theme.clone()}
-                    on_theme_click={on_theme_click}
-                    is_pin_required={*is_pin_required}
-                    on_logout={on_logout}
-                    language={*language_state}
-                    on_language_change={on_language_change}
+                    language={shared_core::i18n::Language::from_code(language_state.code())}
+                    toggle_theme={on_theme_click}
+                    on_language_change={
+                        let on_language_change = on_language_change.clone();
+                        Callback::from(move |lang: shared_core::i18n::Language| on_language_change.emit(crate::i18n::Language::from_code(lang.code())))
+                    }
+                    is_authenticated={true}
+                    pin_required={*is_pin_required}
+                    on_logout={
+                        let on_logout = on_logout.clone();
+                        Callback::from(move |_| on_logout.emit(()))
+                    }
                     enable_translation={*enable_translation}
                     enable_themes={*enable_themes}
                     enable_print={*enable_print}
+                    print_disabled={false}
+                    on_print={None}
                 />
+                <div class="flex justify-between items-center px-5 py-2 border-b border-gray-200 dark:border-gray-800">
+                    <div class="flex space-x-3">
+                        <button class="focus:outline-none" onclick={ { let s = state.clone(); Callback::from(move |_| s.dispatch(Action::SetInfoOpen(true))) } } aria-label="Info">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-6 w-6 cursor-pointer dark:stroke-white text-gray-700 dark:text-gray-300">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z" />
+                            </svg>
+                        </button>
+                        <button class="focus:outline-none" onclick={ { let s = state.clone(); Callback::from(move |_| s.dispatch(Action::SetStatsOpen(true))) } } aria-label="Stats">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-6 w-6 cursor-pointer dark:stroke-white text-gray-700 dark:text-gray-300">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" />
+                            </svg>
+                        </button>
+                        {if ENABLE_ARCHIVED_GAMES {
+                            html! {
+                                <button class="focus:outline-none" onclick={ { let s = state.clone(); Callback::from(move |_| s.dispatch(Action::SetDatePickerOpen(true))) } } aria-label="DatePicker">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-6 w-6 cursor-pointer dark:stroke-white text-gray-700 dark:text-gray-300">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5m-9-6h.008v.008H12v-.008zM12 15h.008v.008H12V15zm0 2.25h.008v.008H12v-.008zM9.75 15h.008v.008H9.75V15zm0 2.25h.008v.008H9.75v-.008zM7.5 15h.008v.008H7.5V15zm0 2.25h.008v.008H7.5v-.008zm6.75-4.5h.008v.008h-.008v-.008zm0 2.25h.008v.008h-.008V15zm0 2.25h.008v.008h-.008v-.008zm2.25-4.5h.008v.008H16.5v-.008zm0 2.25h.008v.008H16.5V15z" />
+                                    </svg>
+                                </button>
+                            }
+                        } else {
+                            html! {}
+                        }}
+                    </div>
+                    <div>
+                        <button class="focus:outline-none" onclick={on_hard_mode_click} aria-label="Hard Mode">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 cursor-pointer text-gray-700 dark:text-gray-300" width="24" height="24" fill={if state.is_hard_mode { "currentColor" } else { "none" }} stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" title="Hard Mode">
+                                <path d="m2 4 3 12h14l3-12-6 7-4-7-4 7-6-7zm3 16h14" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
                 <Alert message={state.alert_msg.clone()} is_visible={state.alert_visible} variant={state.alert_variant.clone()} />
                 <div class="mx-auto flex w-full max-w-7xl flex-grow flex-col px-1 py-1 sm:py-2 sm:px-6 lg:px-8">
                     <Grid solution={solution} guesses={state.guesses.clone()} current_guess={state.current_guess.clone()} is_revealing={state.is_revealing} current_row_class_name={state.jiggle_class.clone()} />

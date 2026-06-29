@@ -127,7 +127,7 @@ pub fn key_btn(props: &KeyProps) -> Html {
                 };
                 format!("{key}{state}", key = value)
             }
-            aria-pressed={status.is_some()}
+            aria-pressed={if status.is_some() { "true" } else { "false" }}
             class={key_classes}
             onclick={click_handler}
         >

@@ -30,7 +30,6 @@ pub mod alerts;
 pub mod app_modals;
 pub mod grid;
 pub mod keyboard;
-pub mod navbar;
 pub mod stat_bar;
 pub mod stat_histogram;
 pub mod weather;

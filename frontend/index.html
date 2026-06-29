@@ -19,6 +19,42 @@
     <meta property="twitter:description" content="Rustle (Description)" />
     <meta property="twitter:image" content="/public/favicon.png" />
     
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        // Prevent theme flicker by setting theme immediately
+        (function() {
+            let theme = null;
+            if (typeof document !== 'undefined' && document.cookie) {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const c = cookies[i].trim();
+                    if (c.startsWith('super_metroid_theme=')) {
+                        theme = c.substring('super_metroid_theme='.length);
+                        break;
+                    }
+                }
+            }
+            if (theme && theme.startsWith('"') && theme.endsWith('"') && theme.length >= 2) {
+                theme = theme.slice(1, -1);
+            }
+            if (!theme) {
+                theme = localStorage.getItem('theme') || 'crateria';
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    theme = theme.slice(1, -1);
+                }
+            }
+            document.documentElement.className = theme;
+            document.documentElement.setAttribute('data-theme', theme);
+        })();
+    </script>
+    <link data-trunk rel="css" href="shared-assets/styles/components/body.css" />
+    <link data-trunk rel="css" href="shared-assets/styles/themes/themes.css" />
+    <link data-trunk rel="css" href="shared-assets/styles/layout/header.css" />
+    <link data-trunk rel="css" href="shared-assets/styles/pages/print.css" />
+    <link data-trunk rel="css" href="shared-assets/styles/layout/footer.css" />
+    
     <!-- Link to pre-compiled Tailwind stylesheet -->
     <link data-trunk rel="css" href="src/tailwind.css" />
     <link data-trunk rel="rust" data-bin="rustle-frontend" data-wasm-opt="0" />
@@ -29,7 +65,7 @@
     <link rel="icon" href="public/favicon.png" type="image/png" />
     <link rel="manifest" href="public/manifest.json" />
   </head>
-  <body class="bg-white dark:bg-slate-900 transition-colors duration-300">
+  <body class="layout-scroll">
     <script>
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
