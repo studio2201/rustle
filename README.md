@@ -30,12 +30,12 @@ services:
     container_name: rustle
     restart: unless-stopped
     ports:
-      - 4409:4409
+      - 4502:4502
     environment:
-      PORT: 4409
+      PORT: 4502
       SITE_TITLE: Rustle
       RUSTLE_PIN: "" # Optional Access PIN
-      BASE_URL: http://localhost:4409
+      BASE_URL: http://localhost:4502
       ALLOWED_ORIGINS: "*"
 ```
 
@@ -45,7 +45,7 @@ services:
 docker compose up -d
 ```
 
-3. Open your browser and navigate to `http://localhost:4409`.
+3. Open your browser and navigate to `http://localhost:4502`.
 
 ### Option 2: Docker CLI
 
@@ -55,10 +55,10 @@ Run the following command to start the container:
 docker run -d \
   --name rustle \
   --restart unless-stopped \
-  -p 4409:4409 \
-  -e PORT=4409 \
+  -p 4502:4502 \
+  -e PORT=4502 \
   -e SITE_TITLE=Rustle \
-  -e BASE_URL=http://localhost:4409 \
+  -e BASE_URL=http://localhost:4502 \
   -e ALLOWED_ORIGINS="*" \
   ubermetroid/rustle:0.1.28
 ```
@@ -71,9 +71,9 @@ Configure these settings inside your Docker Compose environment or container env
 
 | Variable | Description | Default |
 | :--- | :--- | :--- |
-| `PORT` | The port number the backend HTTP server will bind to inside the container. | `4409` |
+| `PORT` | The port number the backend HTTP server will bind to inside the container. | `4502` |
 | `SITE_TITLE` | Custom website title rendered in navigation headers, browser tabs, and PWA manifest. | `Rustle` |
-| `BASE_URL` | Application base URL. Essential when deploying behind reverse proxies to ensure redirect and websocket links are resolved correctly. | `http://localhost:4409` |
+| `BASE_URL` | Application base URL. Essential when deploying behind reverse proxies to ensure redirect and websocket links are resolved correctly. | `http://localhost:4502` |
 | `ALLOWED_ORIGINS` | Comma-separated list of allowed HTTP request origins (CORS filter). Use `*` to allow all origins. | `*` |
 | `RUSTLE_PIN` | Optional 4–10 digit PIN (numerical only) to lock access to the interface. Leave empty for public mode. | None |
 | `TZ` | Timezone for the container processes and logs. | `UTC` |

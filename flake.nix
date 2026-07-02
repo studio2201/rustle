@@ -74,11 +74,11 @@
             Cmd = [ "${app}/bin/server" ];
             WorkingDir = "/app";
             Env = [
-              "PORT=4409"
+              "PORT=4502"
               "RUNNING_IN_DOCKER=true"
             ];
             ExposedPorts = {
-              "4409/tcp" = {};
+              "4502/tcp" = {};
             };
             User = "nobody:nobody";
           };

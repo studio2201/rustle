@@ -4,7 +4,7 @@ dist = "dist"
 
 [serve]
 address = "127.0.0.1"
-port = 4409
+port = 4502
 ws_protocol = "ws"
 
 [watch]

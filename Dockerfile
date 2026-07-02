@@ -41,8 +41,8 @@ RUN chown -R 99:100 /app
 # Run as Unraid nobody:users
 USER 99:100
 
-EXPOSE 4409
-ENV PORT=4409
+EXPOSE 4502
+ENV PORT=4502
 ENV RUNNING_IN_DOCKER=true
 ENV NODE_ENV=production
 ENV LOG_DIR=/app/log

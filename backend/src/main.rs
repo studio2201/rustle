@@ -9,7 +9,7 @@
 //
 
 pub mod auth;
-pub mod handlers;
+pub mod routes;
 pub mod utils;
 
 use axum::{
@@ -24,7 +24,7 @@ use auth::{
     auth_check, auth_middleware, logout, pin_required, security_headers_middleware, verify_pin,
     AppState,
 };
-use handlers::{serve_asset_manifest, serve_index, serve_service_worker};
+use routes::{serve_asset_manifest, serve_index, serve_service_worker};
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt, Layer};
 
 #[tokio::main]
@@ -90,7 +90,7 @@ async fn main() {
     let port = std::env::var("PORT")
         .ok()
         .and_then(|p| p.parse().ok())
-        .unwrap_or(4409);
+        .unwrap_or(4502);
 
     // 2. Allowed origins
     let allowed_origins = std::env::var("ALLOWED_ORIGINS").unwrap_or_else(|_| "*".to_string());
@@ -125,8 +125,8 @@ async fn main() {
         .unwrap_or(true);
 
     let enable_print = std::env::var("ENABLE_PRINT")
-        .map(|v| v == "true" || v == "on")
-        .unwrap_or(false);
+        .map(|v| v != "false" && v != "off")
+        .unwrap_or(true);
 
     let app_state = AppState {
         pin,
