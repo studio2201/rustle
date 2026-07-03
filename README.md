@@ -81,37 +81,3 @@ Configure these settings inside your Docker Compose environment or container env
 | `ENABLE_THEMES` | Enable the Super Metroid theme selector in the navigation header (true/false). | `true` |
 | `ENABLE_PRINT` | Enable the print button in the navigation header (true/false). | `false` |
 | `MAX_ATTEMPTS` | Number of failed PIN attempts permitted before locking out the user client IP address. | `5` |
-
-## Repository Structure
-
-```
-.
-├── Cargo.toml
-├── backend/
-│   ├── Cargo.toml
-│   └── src/
-│       ├── main.rs
-│       ├── handlers.rs
-│       ├── utils.rs
-│       ├── login.html
-│       └── auth/
-│           ├── mod.rs
-│           ├── lockout.rs
-│           ├── crypto.rs
-│           ├── handlers.rs
-│           └── middleware.rs
-└── frontend/
-    ├── Cargo.toml
-    └── src/
-        ├── main.rs
-        ├── app_effects.rs
-        ├── app_state.rs
-        ├── constants.rs
-        ├── index.css
-        ├── tailwind.css
-        ├── app/
-        ├── components/
-        ├── constants/
-        ├── helpers/
-        └── i18n/
-```
