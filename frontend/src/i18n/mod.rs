@@ -1,6 +1,29 @@
 // Copyright (C) 2026 UberMetroid
 //
 // This file is part of Rustle.
+//
+// Rustle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Rustle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Rustle.  If not, see <https://www.gnu.org/licenses/>.
+
+//! Per-language UI translations for Rustle.
+//!
+//! The [`Language`] enum, code/label helpers, and the locale persistence
+//! (`get_saved_locale` / `set_saved_locale`) are now provided by the
+//! shared `shared_core::i18n` and `shared_frontend::locale` modules —
+//! Rustle keeps only its Wordle-specific [`Translations`] struct and
+//! the per-language files.
+
+pub use shared_core::i18n::Language;
 
 mod de;
 mod en;
@@ -10,46 +33,6 @@ mod ja;
 mod pt;
 mod ru;
 mod zh;
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
-pub enum Language {
-    English,
-    Chinese,
-    Spanish,
-    German,
-    Japanese,
-    French,
-    Portuguese,
-    Russian,
-}
-
-impl Language {
-    pub fn code(self) -> &'static str {
-        match self {
-            Self::English => "en",
-            Self::Chinese => "zh",
-            Self::Spanish => "es",
-            Self::German => "de",
-            Self::Japanese => "ja",
-            Self::French => "fr",
-            Self::Portuguese => "pt",
-            Self::Russian => "ru",
-        }
-    }
-
-    pub fn from_code(code: &str) -> Self {
-        match code {
-            "zh" => Self::Chinese,
-            "es" => Self::Spanish,
-            "de" => Self::German,
-            "ja" => Self::Japanese,
-            "fr" => Self::French,
-            "pt" => Self::Portuguese,
-            "ru" => Self::Russian,
-            _ => Self::English,
-        }
-    }
-}
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct Translations {
@@ -91,61 +74,13 @@ pub fn get_translations(lang: Language) -> Translations {
     }
 }
 
-// Self-contained storage helper
-pub struct StorageService;
-impl StorageService {
-    pub fn get_item(_key: &str) -> String {
-        #[cfg(target_arch = "wasm32")]
-        if let Some(win) = web_sys::window() {
-            if let Ok(Some(storage)) = win.local_storage() {
-                return storage.get_item(_key).ok().flatten().unwrap_or_default();
-            }
-        }
-        String::new()
-    }
-
-    pub fn set_item(_key: &str, _value: &str) {
-        #[cfg(target_arch = "wasm32")]
-        if let Some(win) = web_sys::window() {
-            if let Ok(Some(storage)) = win.local_storage() {
-                let _ = storage.set_item(_key, _value);
-            }
-        }
-    }
-}
-
 pub fn get_saved_language() -> Language {
-    let stored = StorageService::get_item("language");
-    if !stored.is_empty() {
-        Language::from_code(&stored)
-    } else {
-        #[cfg(target_arch = "wasm32")]
-        if let Some(window) = web_sys::window() {
-            if let Some(nav) = window.navigator().language() {
-                let nav = nav.to_lowercase();
-                if nav.starts_with("zh") {
-                    return Language::Chinese;
-                } else if nav.starts_with("es") {
-                    return Language::Spanish;
-                } else if nav.starts_with("de") {
-                    return Language::German;
-                } else if nav.starts_with("ja") {
-                    return Language::Japanese;
-                } else if nav.starts_with("fr") {
-                    return Language::French;
-                } else if nav.starts_with("pt") {
-                    return Language::Portuguese;
-                } else if nav.starts_with("ru") {
-                    return Language::Russian;
-                }
-            }
-        }
-        Language::English
-    }
+    let raw = shared_frontend::detect_browser_locale();
+    Language::from_code(&raw)
 }
 
 pub fn save_language(lang: Language) {
-    StorageService::set_item("language", lang.code());
+    shared_frontend::set_saved_locale(lang.code());
 }
 
 #[derive(Clone, PartialEq)]

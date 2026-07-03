@@ -1,9 +1,9 @@
 [package]
 name = "rustle-frontend"
 version = "0.1.32"
-edition = "2021"
+edition = "2024"
 authors = ["UberMetroid"]
-license = "GPL-3.0-only"
+license = "GPL-3.0-or-later"
 repository = "https://github.com/UberMetroid/rustle"
 homepage = "https://github.com/UberMetroid/rustle"
 description = "Yew frontend application for Rustle."
@@ -21,8 +21,8 @@ gloo-timers = "0.4"
 gloo-utils = "0.3"
 gloo-events = "0.2"
 gloo-net = "0.7"
-shared-frontend = { git = "https://github.com/UberMetroid/shared-assets.git", tag = "v3.0.3" }
-shared-core = { git = "https://github.com/UberMetroid/shared-assets.git", tag = "v3.0.3" }
+shared-frontend = { git = "https://github.com/UberMetroid/shared-assets.git", tag = "v3.0.18" }
+shared-core = { git = "https://github.com/UberMetroid/shared-assets.git", tag = "v3.0.18" }
 chrono = { version = "0.4", features = ["serde"] }
 base64 = "0.21"
 blowfish = "0.9"

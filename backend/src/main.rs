@@ -7,6 +7,13 @@
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
+// Rustle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Rustle.  If not, see <https://www.gnu.org/licenses/>.
 
 pub mod auth;
 pub mod routes;
@@ -17,7 +24,10 @@ use axum::{
     routing::{get, post},
     Router,
 };
-use std::net::SocketAddr;
+use shared_backend::middleware::cors_layer;
+use shared_backend::server::ServerConfig;
+use shared_backend::tracing_init::{default_log_dir, init_tracing};
+use std::sync::Arc;
 use tower_http::services::{ServeDir, ServeFile};
 
 use auth::{
@@ -25,121 +35,32 @@ use auth::{
     AppState,
 };
 use routes::{serve_asset_manifest, serve_index, serve_service_worker};
-use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt, Layer};
 
 #[tokio::main]
 async fn main() {
-    let log_dir = std::env::var("LOG_DIR").ok().or_else(|| {
-        let data_dir = std::path::Path::new("/app/data");
-        if data_dir.is_dir() {
-            Some("/app/data/log".to_string())
-        } else {
-            Some("/app/log".to_string())
-        }
-    });
+    // Bootstrap tracing — shared helper reads `LOG_DIR` env var and
+    // configures file + stdout logging.
+    let log_dir = default_log_dir();
+    init_tracing(log_dir.as_deref());
 
-    let (file_layer_error, file_layer_app) = if let Some(ref dir) = log_dir {
-        if dir == "off" || dir == "none" || dir == "false" {
-            (None, None)
-        } else {
-            let _ = std::fs::create_dir_all(dir);
-            let error_file = std::fs::OpenOptions::new()
-                .create(true)
-                .append(true)
-                .open(std::path::Path::new(dir).join("error.log"))
-                .ok();
-            let app_file = std::fs::OpenOptions::new()
-                .create(true)
-                .append(true)
-                .open(std::path::Path::new(dir).join("app.log"))
-                .ok();
+    // Load configuration from env. The shared `ServerConfig::from_env`
+    // reads common variables like `PORT`, `SITE_TITLE`, `ALLOWED_ORIGINS`,
+    // PIN, attempts/cookie settings.
+    //
+    // Rustle's app-prefix is "RUSTLE".
+    let mut config = ServerConfig::from_env("RUSTLE");
 
-            let error_layer = error_file.map(|file| {
-                tracing_subscriber::fmt::layer()
-                    .with_writer(std::sync::Mutex::new(file))
-                    .with_ansi(false)
-                    .with_filter(tracing_subscriber::filter::LevelFilter::WARN)
-            });
+    // App-specific tweak: Rustle historically defaulted to port 4502
+    // (the shared default is 4401). Preserve that for backward compat.
+    if std::env::var("PORT").is_err() {
+        config.port = 4502;
+    }
 
-            let app_layer = app_file.map(|file| {
-                tracing_subscriber::fmt::layer()
-                    .with_writer(std::sync::Mutex::new(file))
-                    .with_ansi(false)
-                    .with_filter(tracing_subscriber::filter::LevelFilter::INFO)
-            });
+    let config = Arc::new(config);
+    let app_state = AppState::new(Arc::clone(&config));
 
-            (error_layer, app_layer)
-        }
-    } else {
-        (None, None)
-    };
+    let cors = cors_layer(&config);
 
-    tracing_subscriber::registry()
-        .with(
-            tracing_subscriber::EnvFilter::try_from_default_env().unwrap_or_else(|_| "info".into()),
-        )
-        .with(tracing_subscriber::fmt::layer())
-        .with(file_layer_error)
-        .with(file_layer_app)
-        .init();
-
-    dotenvy::from_path("/app/data/.env").ok();
-    dotenvy::dotenv().ok();
-
-    // 1. Ports
-    let port = std::env::var("PORT")
-        .ok()
-        .and_then(|p| p.parse().ok())
-        .unwrap_or(4502);
-
-    // 2. Allowed origins
-    let allowed_origins = std::env::var("ALLOWED_ORIGINS").unwrap_or_else(|_| "*".to_string());
-
-    // 3. Site title
-    let site_title = std::env::var("RUSTLE_TITLE")
-        .or_else(|_| std::env::var("RUSTLE_SITE_TITLE"))
-        .or_else(|_| std::env::var("SITE_TITLE"))
-        .unwrap_or_else(|_| "Rustle".to_string());
-
-    // 4. PIN
-    let is_container = std::env::var("RUNNING_IN_DOCKER").ok().map(|v| v == "true").unwrap_or(false)
-        || std::path::Path::new("/.dockerenv").exists();
-
-    let pin = if is_container {
-        std::env::var("RUSTLE_PIN")
-            .or_else(|_| std::env::var("PIN"))
-            .ok()
-            .filter(|p| {
-                !p.is_empty() && p.chars().all(|c| c.is_ascii_digit()) && p.len() >= 4 && p.len() <= 10
-            })
-    } else {
-        None
-    };
-
-    let enable_translation = std::env::var("ENABLE_TRANSLATION")
-        .map(|v| v == "true" || v == "on")
-        .unwrap_or(false);
-
-    let enable_themes = std::env::var("ENABLE_THEMES")
-        .map(|v| v != "false" && v != "off")
-        .unwrap_or(true);
-
-    let enable_print = std::env::var("ENABLE_PRINT")
-        .map(|v| v != "false" && v != "off")
-        .unwrap_or(true);
-
-    let app_state = AppState {
-        pin,
-        site_title,
-        allowed_origins: allowed_origins.clone(),
-        enable_translation,
-        enable_themes,
-        enable_print,
-    };
-
-    let cors = get_cors_layer(&allowed_origins);
-
-    // Define main app router
     let api_routes = Router::new()
         .route("/pin-required", get(pin_required))
         .route("/verify-pin", post(verify_pin))
@@ -161,35 +82,14 @@ async fn main() {
         .layer(middleware::from_fn(security_headers_middleware))
         .with_state(app_state.clone());
 
-    let addr = SocketAddr::from(([0, 0, 0, 0], port));
-    println!("Server running natively on http://localhost:{}", port);
+    let addr = std::net::SocketAddr::from(([0, 0, 0, 0], config.port));
+    println!("Server running natively on http://localhost:{}", config.port);
 
     let listener = tokio::net::TcpListener::bind(addr).await.unwrap();
-    axum::serve(listener, app.into_make_service_with_connect_info::<SocketAddr>()).await.unwrap();
-}
-
-fn get_cors_layer(allowed_origins_env: &str) -> tower_http::cors::CorsLayer {
-    use axum::http::HeaderValue;
-    use tower_http::cors::Any;
-
-    if allowed_origins_env == "*" {
-        tower_http::cors::CorsLayer::new()
-            .allow_origin(Any)
-            .allow_methods(Any)
-            .allow_headers(Any)
-    } else {
-        let mut origins = Vec::new();
-        for origin in allowed_origins_env.split(',') {
-            let o = origin.trim();
-            if !o.is_empty() {
-                if let Ok(val) = HeaderValue::from_str(o) {
-                    origins.push(val);
-                }
-            }
-        }
-        tower_http::cors::CorsLayer::new()
-            .allow_origin(origins)
-            .allow_methods(Any)
-            .allow_headers(Any)
-    }
+    axum::serve(
+        listener,
+        app.into_make_service_with_connect_info::<std::net::SocketAddr>(),
+    )
+    .await
+    .unwrap();
 }

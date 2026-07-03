@@ -36,9 +36,9 @@ pub async fn serve_index(
     State(state): State<AppState>,
 ) -> impl IntoResponse {
     // If PIN is configured and user is NOT authenticated, serve the login page
-    if let Some(ref pin) = state.pin {
+    if let Some(pin) = state.config.pin.as_deref() {
         if !is_authorized(&headers, pin) {
-            let login_rendered = LOGIN_HTML.replace("{SITE_TITLE}", &state.site_title);
+            let login_rendered = LOGIN_HTML.replace("{SITE_TITLE}", state.site_title());
             return Html(login_rendered).into_response();
         }
     }
@@ -68,20 +68,24 @@ pub async fn serve_index(
         if is_today {
             format!(
                 "{} {} - Special {} Edition!",
-                state.site_title, puzzle_num_str, holiday_name
+                state.site_title(),
+                puzzle_num_str,
+                holiday_name
             )
         } else {
             format!(
                 "{} {} ({} Archive)",
-                state.site_title, puzzle_num_str, holiday_name
+                state.site_title(),
+                puzzle_num_str,
+                holiday_name
             )
         }
     } else if is_today {
-        format!("{} {}", state.site_title, puzzle_num_str)
+        format!("{} {}", state.site_title(), puzzle_num_str)
     } else {
         format!(
             "{} {} (Archive - {})",
-            state.site_title,
+            state.site_title(),
             puzzle_num_str,
             game_date.format("%Y-%m-%d")
         )
@@ -90,12 +94,15 @@ pub async fn serve_index(
     let display_description = if let Some((_, holiday_name)) = holiday_info {
         format!(
             "Play {} {}: Celebrate {} with this special edition 5-letter word puzzle! Solve it using custom holiday theme colors.",
-            state.site_title, puzzle_num_str, holiday_name
+            state.site_title(),
+            puzzle_num_str,
+            holiday_name
         )
     } else {
         format!(
             "Play {} {}: Can you guess the secret 5-letter word in 6 attempts? Solve the daily puzzle using Metroid themes, dark mode, and responsive layouts.",
-            state.site_title, puzzle_num_str
+            state.site_title(),
+            puzzle_num_str
         )
     };
 
