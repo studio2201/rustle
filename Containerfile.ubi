@@ -32,7 +32,9 @@ COPY rust-toolchain.toml ./
 # Install the exact channel from rust-toolchain.toml (1.96 + wasm32)
 RUN rustup show \
  && rustup target add wasm32-unknown-unknown \
- && cargo install trunk wasm-bindgen-cli --locked
+ && cargo install trunk wasm-bindgen-cli --locked \
+ && curl -sL -o /usr/local/bin/tailwindcss https://github.com/tailwindlabs/tailwindcss/releases/download/v3.4.17/tailwindcss-linux-x64 \
+ && chmod +x /usr/local/bin/tailwindcss
 
 # Cache deps: copy manifests first
 COPY Cargo.toml Cargo.lock ./

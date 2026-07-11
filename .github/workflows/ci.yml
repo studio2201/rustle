@@ -25,6 +25,11 @@ jobs:
       - name: Install wasm-bindgen-cli
         run: wget -qO- https://github.com/wasm-bindgen/wasm-bindgen/releases/download/0.2.121/wasm-bindgen-0.2.121-x86_64-unknown-linux-musl.tar.gz | sudo tar -xzf- --strip-components=1 -C /usr/local/bin
 
+      - name: Install Tailwind CSS
+        run: |
+          sudo wget -qO /usr/local/bin/tailwindcss https://github.com/tailwindlabs/tailwindcss/releases/download/v3.4.17/tailwindcss-linux-x64
+          sudo chmod +x /usr/local/bin/tailwindcss
+
       - name: Build Frontend
         working-directory: frontend
         run: trunk build --release
