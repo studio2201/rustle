@@ -28,5 +28,5 @@ chrono = { version = "0.4", features = ["serde"] }
 tracing = "0.1"
 constant_time_eq = "0.5"
 rand = { version = "0.10", features = ["std", "thread_rng"] }
-shared-core = { git = "https://github.com/UberMetroid/shared-assets.git", tag = "v3.0.19" }
+shared-core = { git = "https://github.com/UberMetroid/shared-assets.git", tag = "v3.0.29" }
 shared-backend = { git = "https://github.com/UberMetroid/shared-assets.git", tag = "v3.0.19" }
