@@ -218,8 +218,8 @@ pub fn app() -> Html {
                     show_version={true}
                     version={env!("CARGO_PKG_VERSION").to_string()}
                     show_github={true}
-                    github_url={Some("https://github.com/UberMetroid/rustle".to_string())}
-                    version_url={Some(format!("https://github.com/UberMetroid/rustle/releases/tag/v{}", env!("CARGO_PKG_VERSION")))}
+                    github_url={Some("https://github.com/studio2201/rustle".to_string())}
+                    version_url={Some(format!("https://github.com/studio2201/rustle/releases/tag/v{}", env!("CARGO_PKG_VERSION")))}
                 >
                     {
                         if state.alert_visible && !state.alert_msg.is_empty() {

@@ -72,7 +72,7 @@ pub fn info_modal(props: &InfoModalProps) -> Html {
 
             <p class="mt-6 text-sm italic text-gray-500 dark:text-gray-300">
                 {"This is an open source version of the word guessing game we all know and love - "}
-                <a href="https://github.com/UberMetroid/rustle" class="font-bold underline" target="_blank" rel="noopener noreferrer">
+                <a href="https://github.com/studio2201/rustle" class="font-bold underline" target="_blank" rel="noopener noreferrer">
                     {"check out the code here"}
                 </a>
             </p>

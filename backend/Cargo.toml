@@ -2,10 +2,10 @@
 name = "backend"
 version = "0.1.52"
 edition = "2024"
-authors = ["UberMetroid"]
+authors = ["studio2201"]
 license = "GPL-3.0-or-later"
-repository = "https://github.com/UberMetroid/rustle"
-homepage = "https://github.com/UberMetroid/rustle"
+repository = "https://github.com/studio2201/rustle"
+homepage = "https://github.com/studio2201/rustle"
 description = "Axum backend service for Rustle."
 readme = "../README.md"
 
