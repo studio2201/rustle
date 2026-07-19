@@ -61,6 +61,7 @@ jobs:
           context: .
           file: Containerfile.ubi
           push: false
+          load: true
           tags: rustle-alpine:test
           platforms: linux/amd64
 
