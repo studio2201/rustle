@@ -1,6 +1,6 @@
 [package]
 name = "rustle-frontend"
-version = "1.0.7"
+version = "1.0.8"
 edition = "2024"
 authors = ["studio2201"]
 license = "GPL-3.0-or-later"

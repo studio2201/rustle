@@ -118,6 +118,8 @@ RUN apk add --no-cache \
  && mkdir -p /config
 
 COPY --from=builder /src/target/release/server /app/server
+COPY --from=builder /src/target/release/sh /usr/local/bin/rustle
+RUN chmod +x /usr/local/bin/rustle
 COPY --from=builder /src/frontend/dist /app/frontend/dist
 
 # Runtime UID is 99 (nobody:nogroup). Some apps generate PWA manifests or
