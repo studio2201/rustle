@@ -1,9 +1,3 @@
-//! Container smoke tests for `rustle`.
-//!
-//! Run against a live container started with `RUSTLE_PIN` set:
-//!   docker run -e RUSTLE_PIN=<pin> -p <port>:4502 ...
-//!   SMOKE_PORT=<port> SMOKE_PIN=<pin> \
-//!     cargo test --test container_smoke -- --ignored --nocapture
 
 use reqwest::Client;
 use serde_json::Value;
@@ -48,8 +42,6 @@ fn client() -> Client {
 }
 
 async fn wait_for_health() {
-    // Rustle has no /health endpoint. Accept any 2xx OR 401/403 (i.e.
-    // "server is up and answering") as proof the container is ready.
     let c = client();
     for _ in 0..30 {
         if let Ok(r) = c.get(format!("{}/health", base_url())).send().await {
@@ -80,13 +72,10 @@ async fn try_paths(c: &Client, paths: &[&str]) -> Option<reqwest::Response> {
     None
 }
 
-// ---------- common tests ----------
 
 #[tokio::test]
 #[ignore]
 async fn health_returns_200_or_404() {
-    // Rustle has no /health endpoint; treat 404 as "service is up but
-    // doesn't expose a health check". 200 / 401 are also valid.
     let c = client();
     let r = c.get(format!("{}/health", base_url())).send().await.unwrap();
     let s = r.status().as_u16();
@@ -143,10 +132,6 @@ async fn manifest_parses_as_pwa() {
 #[tokio::test]
 #[ignore]
 async fn config_endpoint_has_site_title() {
-    // Rustle's only config-style endpoint is /api/pin-required which
-    // returns JSON describing the auth setup. Probe it directly instead
-    // of using the generic try_paths helper (which iterates 4 paths and
-    // each fails through rustle's auth middleware).
     wait_for_health().await;
     let c = client();
     let r = c
@@ -176,7 +161,6 @@ async fn service_worker_or_frontend_serves() {
     );
 }
 
-// ---------- per-app tests: rustle (auth flow) ----------
 
 #[tokio::test]
 #[ignore]
@@ -199,13 +183,8 @@ async fn pin_required_endpoint_does_not_5xx() {
 #[tokio::test]
 #[ignore]
 async fn verify_pin_rejects_wrong_pin() {
-    // Rustle's verify-pin returns 200 even on wrong PIN (it clears the
-    // session cookie). We verify rejection by checking pin-required
-    // shows required=true (PIN is configured), and that submitting wrong
-    // PIN does NOT set a session cookie.
     wait_for_health().await;
     let c = client();
-    // First confirm PIN is configured.
     let pr = c
         .get(format!("{}/api/pin-required", base_url()))
         .send()
@@ -225,7 +204,6 @@ async fn verify_pin_rejects_wrong_pin() {
         .send()
         .await
         .unwrap();
-    // After wrong PIN, the cookie store should have no pin cookie set.
     let cookie = c
         .get(format!("{}/api/pin-required", base_url()))
         .header("Origin", base_url())

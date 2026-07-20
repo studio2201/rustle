@@ -1,31 +1,8 @@
-// Copyright (C) 2026 UberMetroid
-//
-// This file is part of Rustle.
-//
-// Rustle is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Rustle is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with Rustle.  If not, see <https://www.gnu.org/licenses/>.
 
 use crate::app_state::{Action, AppState};
 use crate::constants::config::{ALERT_TIME_MS, LONG_ALERT_TIME_MS, MAX_CHALLENGES, REVEAL_TIME_MS};
 use yew::prelude::*;
 
-/// Create the callback triggered when the player hits the 'Enter' key to submit a guess.
-///
-/// This handler enforces Wordle/Rustle gameplay rules:
-/// 1. Short guess check: Must type a word of matching length.
-/// 2. Dictionary check: Must type a valid word from the dictionary.
-/// 3. Hard Mode constraint check: Must reuse revealed clues in subsequent guesses.
-/// 4. Game state transitions: Updates won/lost flags, streaks, and schedules alerts/modals.
 pub fn build_on_enter(
     state: UseReducerHandle<AppState>,
     show_alert: Callback<(String, String, u32)>,
@@ -34,27 +11,23 @@ pub fn build_on_enter(
     i18n: crate::i18n::I18nContext,
 ) -> Callback<()> {
     Callback::from(move |()| {
-        // If the game is already finished, do not accept further guesses.
         if state.is_game_won || state.is_game_lost {
             return;
         }
         let guess_len = state.current_guess.chars().count();
         let sol_len = solution.chars().count();
 
-        // Rule 1: Validate character count matches target word length.
         if guess_len < sol_len {
             show_alert.emit((
                 i18n.translations.not_enough_letters.to_string(),
                 "error".to_string(),
                 ALERT_TIME_MS,
             ));
-            // Trigger visual shaking animation on the guess row.
             state.dispatch(Action::SetJiggle("jiggle".to_string()));
             return;
         }
 
         let word = state.current_guess.clone().to_uppercase();
-        // Rule 2: Validate guess is present in the dictionary.
         if !crate::helpers::words::is_word_in_word_list(&word) {
             show_alert.emit((
                 i18n.translations.word_not_found.to_string(),
@@ -65,8 +38,6 @@ pub fn build_on_enter(
             return;
         }
 
-        // Rule 3: Enforce hard mode restrictions if active.
-        // Guesses must contain all previously revealed letters (correct positions and present symbols).
         if state.is_hard_mode {
             if let Some(fail) =
                 crate::helpers::words::find_first_unused_reveal(&word, &state.guesses, solution)
@@ -77,7 +48,6 @@ pub fn build_on_enter(
             }
         }
 
-        // Lock grid interactions and begin row tile reveal animation sequence.
         state.dispatch(Action::SetRevealing(true));
         let state_rev = state.clone();
         gloo_timers::callback::Timeout::new(REVEAL_TIME_MS * sol_len as u32, move || {
@@ -85,12 +55,10 @@ pub fn build_on_enter(
         })
         .forget();
 
-        // Append guess to history list and trigger state update.
         let mut new_guesses = state.guesses.clone();
         new_guesses.push(word.clone());
         state.dispatch(Action::SetGuesses(new_guesses.clone()));
 
-        // Persist guesses to LocalStorage.
         crate::helpers::local_storage::save_game_state_to_local_storage(
             is_latest_game,
             &crate::helpers::local_storage::StoredGameState {
@@ -99,12 +67,9 @@ pub fn build_on_enter(
             },
         );
 
-        // Reset the typing buffer for the next guess.
         state.dispatch(Action::ClearGuess);
 
-        // Rule 4: Check Win/Loss conditions or offer intermediate match comments.
         if crate::helpers::words::is_winning_word(&word, solution) {
-            // Player won! Update state and win statistics.
             state.dispatch(Action::SetWon(true));
             state.dispatch(Action::SetGameStats(
                 crate::helpers::stats::add_stats_for_completed_game(
@@ -113,13 +78,11 @@ pub fn build_on_enter(
                 ),
             ));
 
-            // Select a congratulations message (supports seasonal themes).
             let win_messages = i18n.translations.win_messages;
             let win_message = get_seasonal_win_message(&state.theme, win_messages);
             let state_won = state.clone();
             let show_alert_clone = show_alert.clone();
             
-            // Wait for flip animation to complete before showing the win summary overlay.
             gloo_timers::callback::Timeout::new(REVEAL_TIME_MS * sol_len as u32, move || {
                 show_alert_clone.emit((win_message, "success".to_string(), ALERT_TIME_MS));
                 state_won.dispatch(Action::SetStatsOpen(true));
@@ -127,7 +90,6 @@ pub fn build_on_enter(
             })
             .forget();
         } else if new_guesses.len() >= MAX_CHALLENGES {
-            // Player lost (out of guesses)! Update stats.
             state.dispatch(Action::SetLost(true));
             state.dispatch(Action::SetGameStats(
                 crate::helpers::stats::add_stats_for_completed_game(
@@ -140,7 +102,6 @@ pub fn build_on_enter(
             let show_alert_clone = show_alert.clone();
             let i18n_clone = i18n.clone();
             
-            // Wait for flip animation to complete before showing correct solution and statistics.
             gloo_timers::callback::Timeout::new(REVEAL_TIME_MS * (sol_len as u32 + 1), move || {
                 let default_msg =
                     crate::i18n::get_correct_word_message(i18n_clone.language, solution);
@@ -150,7 +111,6 @@ pub fn build_on_enter(
             })
             .forget();
         } else {
-            // Game continues: calculate correct/present matches to emit a hint feedback message.
             let statuses = crate::helpers::statuses::get_guess_statuses(solution, &word);
             let correct = statuses
                 .iter()
@@ -162,7 +122,6 @@ pub fn build_on_enter(
                 .count();
             let total_matches = correct + present;
 
-            // Fetch a motivating comment (e.g. "Almost there" or "No match") based on target theme.
             let feedback_msg =
                 crate::helpers::feedback::get_intermediate_comment(&state.theme, total_matches);
             let show_alert_clone = show_alert.clone();

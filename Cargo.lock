@@ -116,7 +116,7 @@ dependencies = [
 
 [[package]]
 name = "backend"
-version = "1.0.9"
+version = "1.0.18"
 dependencies = [
  "axum",
  "chrono",
@@ -1608,7 +1608,7 @@ checksum = "6b1e7f9a428571be2dc5bc0505c13fb6bf936822b894ec87abf8a08a4e51742d"
 
 [[package]]
 name = "rustle-frontend"
-version = "1.0.9"
+version = "1.0.18"
 dependencies = [
  "base64",
  "blowfish",
@@ -1774,8 +1774,8 @@ dependencies = [
 
 [[package]]
 name = "shared-backend"
-version = "3.0.29"
-source = "git+https://github.com/UberMetroid/shared-assets.git?tag=v3.0.29#cad2021cf1809e6ac00dce80beab5f241272fc69"
+version = "3.0.30"
+source = "git+https://github.com/UberMetroid/shared-assets.git?tag=v3.0.30#a6cfecb3c5d5b57c8c6467af9fb59ab01302011d"
 dependencies = [
  "anyhow",
  "axum",
@@ -1795,8 +1795,8 @@ dependencies = [
 
 [[package]]
 name = "shared-core"
-version = "3.0.29"
-source = "git+https://github.com/UberMetroid/shared-assets.git?tag=v3.0.29#cad2021cf1809e6ac00dce80beab5f241272fc69"
+version = "3.0.30"
+source = "git+https://github.com/UberMetroid/shared-assets.git?tag=v3.0.30#a6cfecb3c5d5b57c8c6467af9fb59ab01302011d"
 dependencies = [
  "constant_time_eq 0.3.1",
  "serde",
@@ -1804,8 +1804,8 @@ dependencies = [
 
 [[package]]
 name = "shared-frontend"
-version = "3.0.29"
-source = "git+https://github.com/UberMetroid/shared-assets.git?tag=v3.0.29#cad2021cf1809e6ac00dce80beab5f241272fc69"
+version = "3.0.30"
+source = "git+https://github.com/UberMetroid/shared-assets.git?tag=v3.0.30#a6cfecb3c5d5b57c8c6467af9fb59ab01302011d"
 dependencies = [
  "js-sys",
  "serde",
