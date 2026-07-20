@@ -1,6 +1,6 @@
 [package]
 name = "backend"
-version = "1.0.20"
+version = "1.0.21"
 edition = "2024"
 authors = ["studio2201"]
 license = "GPL-3.0-or-later"
@@ -28,7 +28,7 @@ chrono = { version = "0.4", features = ["serde"] }
 tracing = "0.1"
 constant_time_eq = "0.5"
 rand = { version = "0.10", features = ["std", "thread_rng"] }
-shared-core = { git = "https://github.com/UberMetroid/shared-assets.git", tag = "v3.0.30" }
-shared-backend = { git = "https://github.com/UberMetroid/shared-assets.git", tag = "v3.0.30" }
+shared-core = { git = "https://github.com/studio2201/shared-assets.git", tag = "v3.0.32" }
+shared-backend = { git = "https://github.com/studio2201/shared-assets.git", tag = "v3.0.32" }
 [dev-dependencies]
 reqwest = { version = "0.12", default-features = false, features = ["json", "rustls-tls", "cookies"] }
