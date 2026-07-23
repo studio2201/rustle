@@ -119,7 +119,7 @@ pub async fn verify_pin(
         attempts::reset_attempts(&ip);
 
         // Issue a session cookie: a random opaque token from the shared CSPRNG.
-        let token = shared_backend::session_id::generate_session_id();
+        let token = crate::session_id::generate_session_id();
 
         state.register_session(token.clone());
 

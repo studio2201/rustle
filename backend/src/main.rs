@@ -1,3 +1,5 @@
+mod cookie_auth;
+mod session_id;
 // Copyright (C) 2026 UberMetroid
 //
 // This file is part of Rustle.
