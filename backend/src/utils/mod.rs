@@ -36,10 +36,10 @@ pub fn get_holiday_for_date(date: chrono::NaiveDate) -> Option<(&'static str, &'
     if let (Some(good_friday), Some(easter_monday)) = (
         easter.checked_sub_signed(chrono::Duration::days(2)),
         easter.checked_add_signed(chrono::Duration::days(1)),
-    ) {
-        if date >= good_friday && date <= easter_monday {
-            return Some(("easter", "Easter"));
-        }
+    ) && date >= good_friday
+        && date <= easter_monday
+    {
+        return Some(("easter", "Easter"));
     }
     if month == 7 && (3..=5).contains(&day) {
         return Some(("independence", "Independence Day"));
@@ -48,10 +48,11 @@ pub fn get_holiday_for_date(date: chrono::NaiveDate) -> Option<(&'static str, &'
         return Some(("halloween", "Halloween"));
     }
     let thanksgiving = get_thanksgiving_thursday(year);
-    if let Some(thanksgiving_sunday) = thanksgiving.checked_add_signed(chrono::Duration::days(3)) {
-        if date >= thanksgiving && date <= thanksgiving_sunday {
-            return Some(("thanksgiving", "Thanksgiving"));
-        }
+    if let Some(thanksgiving_sunday) = thanksgiving.checked_add_signed(chrono::Duration::days(3))
+        && date >= thanksgiving
+        && date <= thanksgiving_sunday
+    {
+        return Some(("thanksgiving", "Thanksgiving"));
     }
     if month == 12 && (20..=26).contains(&day) {
         return Some(("christmas", "Christmas"));
@@ -101,11 +102,11 @@ pub fn get_files_recursive(dir: &Path, base: &Path) -> Vec<String> {
             let path = entry.path();
             if path.is_dir() {
                 files.extend(get_files_recursive(&path, base));
-            } else if let Ok(rel) = path.strip_prefix(base) {
-                if let Some(s) = rel.to_str() {
-                    let url = format!("/{}", s.replace('\\', "/"));
-                    files.push(url);
-                }
+            } else if let Ok(rel) = path.strip_prefix(base)
+                && let Some(s) = rel.to_str()
+            {
+                let url = format!("/{}", s.replace('\\', "/"));
+                files.push(url);
             }
         }
     }

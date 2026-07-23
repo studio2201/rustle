@@ -1,65 +1,100 @@
+<h1 align="center">
+  <img src="https://raw.githubusercontent.com/studio2201/.github/master/profile/assets/rustle.png" width="48" height="48" valign="middle"> Rustle
+</h1>
+
 <p align="center">
-  <a href="https://github.com/studio2201">
-    <img src="assets/header.jpg" alt="studio2201 banner" width="100%">
-  </a>
+  <b>Self-hosted Wordle clone with multi-language support, custom themes, and zero tracking written in Rust.</b>
 </p>
 
-# <img src="assets/icon.png" width="32" height="32" valign="middle"> Rustle
+---
 
-High-performance self-hosted word puzzle gameplay engine.
+### Instant One-Line Install (Docker Container)
 
-## Quick Start (Docker)
+Run the official zero-dependency container on port 4503:
 
-Pull and run the official Docker container:
 ```bash
-docker run -d \
-  -p 4502:4502 \
-  -v /path/to/appdata:/config \
-  -e RUSTLE_PIN=your_secret_pin \
-  ghcr.io/studio2201/rustle:latest
+docker run -d --name rustle -p 4503:4503 -v /mnt/user/appdata/rustle:/config ghcr.io/studio2201/rustle:latest
 ```
 
-## Configuration
+Open your browser to `http://localhost:4503` to start guessing the daily word.
 
-The service can be customized using the following container environment variables:
+---
+
+### One-Line Install (Native Package Manager)
+
+On Debian, Ubuntu, Fedora, or RHEL:
+
+```bash
+curl -fsSL https://studio2201.github.io/packages/install.sh | sudo bash
+```
+
+---
+
+### Unraid NAS Deployment
+
+Deploy via the official Unraid Template:
+
+1. Copy [`rustle.xml`](rustle.xml) to your Unraid flash drive under `/boot/config/plugins/dockerMan/templates-user/`.
+2. Open **Docker** -> **Add Container** -> Select **rustle** from the template dropdown.
+3. Click **Apply**.
+
+---
+
+### Environment Configuration
+
+The backend service can be customized using the following environment variables:
 
 | Variable | Description | Default |
-| :--- | :--- | :--- |
-| `PORT` | The network port the web server binds to | `4502` |
-| `RUSTLE_PIN` | Security PIN code required for client authentication | (None) |
-| `RUSTLE_DATA_DIR` | Directory path where persistent data is stored | `/config` |
+| :--- | :--- | :---: |
+| `PORT` | Network port the web server binds to | `4503` |
+| `RUSTLE_PIN` | Security PIN required for application access | *(Disabled)* |
+| `RUSTLE_DATA_DIR` | Directory path for persistent data and statistics | `/config` |
 | `RUSTLE_ALLOWED_ORIGINS` | CORS allowed origins list (comma-separated) | `*` |
-| `TZ` | System timezone | `UTC` |
-| `TRUST_PROXY` | Whether to honor upstream reverse proxy headers | `false` |
-| `TRUSTED_PROXY_IPS` | Comma-separated CIDR/IP list of trusted reverse proxies | (None) |
-| `LOG_DIR` | Directory where diagnostic log files are written | (Disabled) |
-| `LOG_LEVEL` | Logging verbosity filter (`error`, `warn`, `info`, `debug`) | `info` |
+| `TRUST_PROXY` | Honor reverse proxy headers (`X-Forwarded-For`) | `false` |
+| `TRUSTED_PROXY_IPS` | Comma-separated CIDR list of trusted reverse proxies | *(None)* |
+| `LOG_LEVEL` | Tracing filter (`error`, `warn`, `info`, `debug`) | `info` |
 
-## Administration Console (CLI & TUI)
+---
 
-Each container includes a built-in admin tool located in the system path as `rustle`. To open the console, execute a shell inside the container:
+### Administration CLI & TUI Dashboard
+
+Every container and package includes a built-in administration utility (`rustle`).
+
+Launch interactive TUI dashboard:
 ```bash
-docker exec -it <container-name> sh
+docker exec -it rustle rustle tui
 ```
-Then, run `rustle` to manage the application:
+
+System diagnostics and self-healing check:
 ```bash
-rustle [command]
+docker exec -it rustle rustle doctor
 ```
-Running `rustle` without arguments or running `rustle tui` launches the interactive terminal user interface.
 
-### CLI Commands
+CLI Command Reference:
+- `rustle tui` — Interactive terminal user interface.
+- `rustle doctor` — Diagnoses storage permissions, ports, and database health.
+- `rustle status` — Displays network configuration and security parameters.
+- `rustle data stats` — Shows storage utilization and entry metrics.
 
-| Command | Aliases | Description |
-| :--- | :--- | :--- |
-| `tui` | (Default) | Launch the interactive arrow-key TUI panel dashboard |
-| `doctor` | `check`, `diagnose` | Perform health diagnostics on directories, port, and databases |
-| `start` | `up`, `run` | Launch the main web server process if stopped |
-| `stop` | `down`, `terminate`, `close` | Gracefully shut down the web server (stops the container) |
-| `restart` | `reload` | Perform a stop and start cycle on the server process |
-| `status` | `info` | Display current network and settings configurations |
-| `env` | | List the loaded environment variables for the service |
-| `version` | `-v`, `--version` | Display the compiled version of the application |
-| `data stats` | `data size`, `data info` | View storage file sizes and entry counts |
-| `data list` | `data show`, `data view` | Show records (tasks, high scores, etc.) stored in the database |
-| `data clear` | `data prune`, `data reset` | Reset the database to a clean, empty state (interactive) |
-| `help` | `-h`, `--help` | Show the help information page |
+---
+
+### Architecture & Security
+
+- **Axum Web Backend**: High-concurrency async HTTP runtime built on Tokio.
+- **Yew WebAssembly Frontend**: Type-safe client bundle running natively in browser WASM runtime.
+- **Strict Input & Path Sanitization**: Path canonicalization guards preventing directory traversal escapes.
+- **Fail-Closed Security PIN Authentication**: Rate-limited brute force protection with automatic lockout timers.
+
+---
+
+### License
+
+Distributed under the Apache 2.0 License. See [LICENSE](LICENSE) for details.
+
+---
+
+<p align="center">
+  <a href="https://github.com/studio2201/rustle">
+    <img src="assets/rustle-header.jpg" alt="studio2201 banner" width="100%">
+  </a>
+</p>

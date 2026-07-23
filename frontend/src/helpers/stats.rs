@@ -17,7 +17,7 @@
 
 use crate::constants::config::MAX_CHALLENGES;
 use crate::helpers::local_storage::{
-    load_stats_from_local_storage, save_stats_to_local_storage, GameStats,
+    GameStats, load_stats_from_local_storage, save_stats_to_local_storage,
 };
 
 pub fn default_stats() -> GameStats {

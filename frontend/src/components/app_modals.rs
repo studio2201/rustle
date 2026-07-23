@@ -38,7 +38,7 @@ pub struct AppModalsProps {
 
 #[function_component(AppModals)]
 pub fn app_modals(props: &AppModalsProps) -> Html {
-    let i18n = use_context::<crate::i18n::I18nContext>().unwrap();
+    let i18n = use_context::<crate::i18n::I18nContext>().unwrap_or_default();
     let translations = i18n.translations.clone();
 
     let state = props.state.clone();

@@ -24,7 +24,7 @@
 #![allow(deprecated, dead_code, unused_imports, unused_variables)]
 
 use wasm_bindgen::prelude::*;
-use web_sys::{window, CanvasRenderingContext2d};
+use web_sys::{CanvasRenderingContext2d, window};
 
 /// Bounding rectangle in viewport coordinates used for physical particle collisions.
 pub struct CollisionRect {

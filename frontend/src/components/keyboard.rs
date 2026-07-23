@@ -17,7 +17,7 @@
 
 use crate::{
     constants::config::REVEAL_TIME_MS,
-    helpers::statuses::{get_statuses, CharStatus},
+    helpers::statuses::{CharStatus, get_statuses},
 };
 use wasm_bindgen::JsCast;
 use yew::prelude::*;
@@ -77,10 +77,10 @@ pub fn key_btn(props: &KeyProps) -> Html {
 
     let val = value.clone();
     let click_handler = Callback::from(move |e: MouseEvent| {
-        if let Some(target) = e.target() {
-            if let Ok(btn) = target.dyn_into::<web_sys::HtmlButtonElement>() {
-                let _ = btn.blur();
-            }
+        if let Some(target) = e.target()
+            && let Ok(btn) = target.dyn_into::<web_sys::HtmlButtonElement>()
+        {
+            let _ = btn.blur();
         }
         on_click.emit(val.clone());
     });
@@ -119,7 +119,7 @@ pub struct KeyboardProps {
 
 #[function_component(Keyboard)]
 pub fn keyboard(props: &KeyboardProps) -> Html {
-    let i18n = use_context::<crate::i18n::I18nContext>().unwrap();
+    let i18n = use_context::<crate::i18n::I18nContext>().unwrap_or_default();
     let solution = props.solution.clone();
     let guesses = props.guesses.clone();
     let on_char = props.on_char.clone();
@@ -145,10 +145,11 @@ pub fn keyboard(props: &KeyboardProps) -> Html {
                                 on_enter.emit(());
                             } else if code == "Backspace" {
                                 on_delete.emit(());
-                            } else if let Some(c) = ke.key().chars().next() {
-                                if ke.key().len() == 1 && c.is_ascii_alphabetic() {
-                                    on_char.emit(c.to_ascii_uppercase());
-                                }
+                            } else if let Some(c) = ke.key().chars().next()
+                                && ke.key().len() == 1
+                                && c.is_ascii_alphabetic()
+                            {
+                                on_char.emit(c.to_ascii_uppercase());
                             }
                         }
                     });

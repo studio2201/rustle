@@ -25,7 +25,7 @@ use yew::prelude::*;
 use crate::components::modal_base::BaseModal;
 use crate::helpers::encryption::{decrypt, encrypt};
 use crate::helpers::local_storage::{
-    save_game_state_to_local_storage, save_stats_to_local_storage, GameStats, StoredGameState,
+    GameStats, StoredGameState, save_game_state_to_local_storage, save_stats_to_local_storage,
 };
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
@@ -103,13 +103,13 @@ pub fn immigrate_panel() -> Html {
                         let _ = class_list.remove_1(c);
                     }
                     is_save_enabled.set(false);
-                    if let Some(decrypted) = decrypt(&text) {
-                        if serde_json::from_str::<MigrationStats>(&decrypted).is_ok() {
-                            let _ = class_list.add_1("bg-gray-100");
-                            let _ = class_list.add_1("dark:bg-gray-700");
-                            is_save_enabled.set(true);
-                            return;
-                        }
+                    if let Some(decrypted) = decrypt(&text)
+                        && serde_json::from_str::<MigrationStats>(&decrypted).is_ok()
+                    {
+                        let _ = class_list.add_1("bg-gray-100");
+                        let _ = class_list.add_1("dark:bg-gray-700");
+                        is_save_enabled.set(true);
+                        return;
                     }
                     if !text.is_empty() {
                         let _ = class_list.add_1("bg-red-400");
@@ -127,19 +127,17 @@ pub fn immigrate_panel() -> Html {
                 let text = textarea.value();
                 if let Some(win) = web_sys::window() {
                     let confirmed = win.confirm_with_message("Are you sure you want to override the statistics on this device? This action is not reversible.").unwrap_or(false);
-                    if confirmed {
-                        if let Some(decrypted) = decrypt(&text) {
-                            if let Ok(migration_stats) =
-                                serde_json::from_str::<MigrationStats>(&decrypted)
-                            {
-                                if let Some(gs) = migration_stats.game_state {
-                                    save_game_state_to_local_storage(true, &gs);
-                                }
-                                save_stats_to_local_storage(&migration_stats.statistics);
-                                let _ = win.alert_with_message("The site will now reload.");
-                                let _ = win.location().reload();
-                            }
+                    if confirmed
+                        && let Some(decrypted) = decrypt(&text)
+                        && let Ok(migration_stats) =
+                            serde_json::from_str::<MigrationStats>(&decrypted)
+                    {
+                        if let Some(gs) = migration_stats.game_state {
+                            save_game_state_to_local_storage(true, &gs);
                         }
+                        save_stats_to_local_storage(&migration_stats.statistics);
+                        let _ = win.alert_with_message("The site will now reload.");
+                        let _ = win.location().reload();
                     }
                 }
             }

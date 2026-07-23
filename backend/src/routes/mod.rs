@@ -15,13 +15,13 @@
 // You should have received a copy of the GNU General Public License
 // along with Rustle.  If not, see <https://www.gnu.org/licenses/>.
 
-use crate::auth::{is_authorized, AppState, LOGIN_HTML};
+use crate::auth::{AppState, LOGIN_HTML, is_authorized};
 use crate::utils::{build_asset_manifest, get_holiday_for_date};
 use axum::{
-    extract::{Query, State},
-    http::{header, HeaderMap, StatusCode},
-    response::{Html, IntoResponse, Response},
     Json,
+    extract::{Query, State},
+    http::{HeaderMap, StatusCode, header},
+    response::{Html, IntoResponse, Response},
 };
 use serde::Deserialize;
 
@@ -36,11 +36,11 @@ pub async fn serve_index(
     State(state): State<AppState>,
 ) -> impl IntoResponse {
     // If PIN is configured and user is NOT authenticated, serve the login page
-    if let Some(pin) = state.config.pin.as_deref() {
-        if !is_authorized(&headers, &state, pin) {
-            let login_rendered = LOGIN_HTML.replace("{SITE_TITLE}", state.site_title());
-            return Html(login_rendered).into_response();
-        }
+    if let Some(pin) = state.config.pin.as_deref()
+        && !is_authorized(&headers, &state, pin)
+    {
+        let login_rendered = LOGIN_HTML.replace("{SITE_TITLE}", state.site_title());
+        return Html(login_rendered).into_response();
     }
 
     // Calculate current game date and index for Open Graph tags

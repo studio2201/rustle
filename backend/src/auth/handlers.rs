@@ -23,10 +23,10 @@
 //! gatekeeping logic lives in `shared_backend::auth::pin_auth_layer`.
 
 use axum::{
-    extract::{ConnectInfo, State},
-    http::{header, HeaderMap, HeaderValue, StatusCode},
-    response::IntoResponse,
     Json,
+    extract::{ConnectInfo, State},
+    http::{HeaderMap, HeaderValue, StatusCode, header},
+    response::IntoResponse,
 };
 use constant_time_eq::constant_time_eq;
 use rand::Rng;
@@ -35,7 +35,7 @@ use shared_backend::auth::{attempts, session};
 use shared_backend::server::ip::get_client_ip;
 use std::net::SocketAddr;
 
-use crate::auth::{is_authorized, AppState, VerifyPinPayload};
+use crate::auth::{AppState, VerifyPinPayload, is_authorized};
 
 /// Returns whether a PIN is required and PIN-related UI state.
 pub async fn pin_required(
@@ -44,12 +44,7 @@ pub async fn pin_required(
     State(state): State<AppState>,
 ) -> impl IntoResponse {
     let config = &state.config;
-    let ip = get_client_ip(
-        &headers,
-        addr,
-        config.trust_proxy,
-        &config.trusted_proxies,
-    );
+    let ip = get_client_ip(&headers, addr, config.trust_proxy, &config.trusted_proxies);
     let lockout = config.lockout_duration();
     let locked = attempts::is_locked_out(&ip, config.max_attempts, lockout);
     let lockout_seconds = attempts::lockout_remaining_secs(&ip, lockout);
@@ -82,12 +77,7 @@ pub async fn verify_pin(
     Json(payload): Json<VerifyPinPayload>,
 ) -> impl IntoResponse {
     let config = &state.config;
-    let ip = get_client_ip(
-        &headers,
-        addr,
-        config.trust_proxy,
-        &config.trusted_proxies,
-    );
+    let ip = get_client_ip(&headers, addr, config.trust_proxy, &config.trusted_proxies);
     let lockout = config.lockout_duration();
 
     if attempts::is_locked_out(&ip, config.max_attempts, lockout) {
@@ -112,9 +102,7 @@ pub async fn verify_pin(
         );
         let _ = response.headers_mut().insert(
             header::SET_COOKIE,
-            HeaderValue::from_static(
-                "pin=; Path=/; HttpOnly; SameSite=Strict; Max-Age=0",
-            ),
+            HeaderValue::from_static("pin=; Path=/; HttpOnly; SameSite=Strict; Max-Age=0"),
         );
         return response;
     };
@@ -190,10 +178,7 @@ pub async fn auth_check(headers: HeaderMap, State(state): State<AppState>) -> im
 }
 
 /// Clears the `pin` cookie (logout).
-pub async fn logout(
-    State(state): State<AppState>,
-    headers: HeaderMap,
-) -> impl IntoResponse {
+pub async fn logout(State(state): State<AppState>, headers: HeaderMap) -> impl IntoResponse {
     let cookie_token = headers
         .get(header::COOKIE)
         .and_then(|c| c.to_str().ok())
@@ -214,5 +199,10 @@ pub async fn logout(
         header::SET_COOKIE,
         HeaderValue::from_static("pin=; Path=/; HttpOnly; SameSite=Strict; Max-Age=0"),
     );
-    (StatusCode::OK, response_headers, Json(json!({ "success": true }))).into_response()
+    (
+        StatusCode::OK,
+        response_headers,
+        Json(json!({ "success": true })),
+    )
+        .into_response()
 }

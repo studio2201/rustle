@@ -1,4 +1,3 @@
-
 use crate::app_state::{Action, AppState};
 use crate::constants::config::{ALERT_TIME_MS, LONG_ALERT_TIME_MS, MAX_CHALLENGES, REVEAL_TIME_MS};
 use yew::prelude::*;
@@ -38,14 +37,13 @@ pub fn build_on_enter(
             return;
         }
 
-        if state.is_hard_mode {
-            if let Some(fail) =
+        if state.is_hard_mode
+            && let Some(fail) =
                 crate::helpers::words::find_first_unused_reveal(&word, &state.guesses, solution)
-            {
-                show_alert.emit((fail, "error".to_string(), ALERT_TIME_MS));
-                state.dispatch(Action::SetJiggle("jiggle".to_string()));
-                return;
-            }
+        {
+            show_alert.emit((fail, "error".to_string(), ALERT_TIME_MS));
+            state.dispatch(Action::SetJiggle("jiggle".to_string()));
+            return;
         }
 
         state.dispatch(Action::SetRevealing(true));
@@ -82,7 +80,7 @@ pub fn build_on_enter(
             let win_message = get_seasonal_win_message(&state.theme, win_messages);
             let state_won = state.clone();
             let show_alert_clone = show_alert.clone();
-            
+
             gloo_timers::callback::Timeout::new(REVEAL_TIME_MS * sol_len as u32, move || {
                 show_alert_clone.emit((win_message, "success".to_string(), ALERT_TIME_MS));
                 state_won.dispatch(Action::SetStatsOpen(true));
@@ -101,7 +99,7 @@ pub fn build_on_enter(
             let state_lost = state.clone();
             let show_alert_clone = show_alert.clone();
             let i18n_clone = i18n.clone();
-            
+
             gloo_timers::callback::Timeout::new(REVEAL_TIME_MS * (sol_len as u32 + 1), move || {
                 let default_msg =
                     crate::i18n::get_correct_word_message(i18n_clone.language, solution);

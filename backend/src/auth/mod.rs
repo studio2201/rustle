@@ -32,7 +32,7 @@ pub mod middleware;
 pub use handlers::{auth_check, logout, pin_required, verify_pin};
 pub use middleware::{auth_middleware, security_headers_middleware};
 
-use axum::http::{header, HeaderMap};
+use axum::http::{HeaderMap, header};
 use serde::Deserialize;
 use shared_backend::auth::PinState;
 use shared_backend::server::ServerConfig;
@@ -69,10 +69,10 @@ impl AppState {
 
     pub fn session_is_valid(&self, token: &str) -> bool {
         let max_age_secs = (self.config.cookie_max_age_hours * 3600) as u64;
-        if let Ok(sessions) = self.active_sessions.read() {
-            if let Some(&created_at) = sessions.get(token) {
-                return created_at.elapsed().as_secs() < max_age_secs;
-            }
+        if let Ok(sessions) = self.active_sessions.read()
+            && let Some(&created_at) = sessions.get(token)
+        {
+            return created_at.elapsed().as_secs() < max_age_secs;
         }
         false
     }

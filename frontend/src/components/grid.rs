@@ -16,7 +16,7 @@
 // along with Rustle.  If not, see <https://www.gnu.org/licenses/>.
 
 use crate::constants::config::{MAX_CHALLENGES, REVEAL_TIME_MS};
-use crate::helpers::statuses::{get_guess_statuses, CharStatus};
+use crate::helpers::statuses::{CharStatus, get_guess_statuses};
 use yew::prelude::*;
 
 #[derive(Properties, PartialEq, Clone)]

@@ -27,19 +27,19 @@ use web_sys::window;
 /// # Returns
 /// `true` if running inside a restricted in-app browser view, `false` otherwise.
 pub fn is_in_app_browser() -> bool {
-    if let Some(win) = window() {
-        if let Ok(ua) = win.navigator().user_agent() {
-            let ua = ua.to_uppercase();
+    if let Some(win) = window()
+        && let Ok(ua) = win.navigator().user_agent()
+    {
+        let ua = ua.to_uppercase();
 
-            // Check for common in-app browser signatures in User-Agent header
-            let is_fb = ua.contains("FBAN") || ua.contains("FBAV");
-            let is_ig = ua.contains("INSTAGRAM");
-            let is_messenger = ua.contains("MESSENGER");
-            let is_twitter = ua.contains("TWITTER");
-            let is_line = ua.contains("LINE");
+        // Check for common in-app browser signatures in User-Agent header
+        let is_fb = ua.contains("FBAN") || ua.contains("FBAV");
+        let is_ig = ua.contains("INSTAGRAM");
+        let is_messenger = ua.contains("MESSENGER");
+        let is_twitter = ua.contains("TWITTER");
+        let is_line = ua.contains("LINE");
 
-            return is_fb || is_ig || is_messenger || is_twitter || is_line;
-        }
+        return is_fb || is_ig || is_messenger || is_twitter || is_line;
     }
     false
 }

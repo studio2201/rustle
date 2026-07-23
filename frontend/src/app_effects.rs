@@ -20,7 +20,7 @@
 
 use crate::app_state::{Action, AppState};
 use crate::constants::config::{
-    DISCOURAGE_INAPP_BROWSERS, DISCOURAGE_INAPP_BROWSER_TEXT, WELCOME_INFO_MODAL_MS,
+    DISCOURAGE_INAPP_BROWSER_TEXT, DISCOURAGE_INAPP_BROWSERS, WELCOME_INFO_MODAL_MS,
 };
 use yew::prelude::*;
 
@@ -64,14 +64,13 @@ pub fn use_app_effects(
     {
         let theme = state.theme.clone();
         use_effect_with(theme, move |theme| {
-            if let Some(win) = web_sys::window() {
-                if let Some(doc) = win.document() {
-                    if let Some(el) = doc.document_element() {
-                        let class_name = format!("{} dark", theme);
-                        let _ = el.set_attribute("class", &class_name);
-                        let _ = el.set_attribute("data-theme", theme);
-                    }
-                }
+            if let Some(win) = web_sys::window()
+                && let Some(doc) = win.document()
+                && let Some(el) = doc.document_element()
+            {
+                let class_name = format!("{} dark", theme);
+                let _ = el.set_attribute("class", &class_name);
+                let _ = el.set_attribute("data-theme", theme);
             }
         });
     }

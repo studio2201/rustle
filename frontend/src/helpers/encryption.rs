@@ -15,9 +15,9 @@
 // You should have received a copy of the GNU General Public License
 // along with Rustle.  If not, see <https://www.gnu.org/licenses/>.
 
-use base64::{engine::general_purpose::STANDARD, Engine as _};
-use blowfish::cipher::{BlockCipherDecrypt, BlockCipherEncrypt, KeyInit};
+use base64::{Engine as _, engine::general_purpose::STANDARD};
 use blowfish::Blowfish;
+use blowfish::cipher::{BlockCipherDecrypt, BlockCipherEncrypt, KeyInit};
 
 pub fn encrypt(data: &str) -> Result<String, String> {
     let key_bytes = crate::constants::config::STATS_MIGRATION_OBFUSCATION_KEY.as_bytes();

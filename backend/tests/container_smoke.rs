@@ -1,4 +1,3 @@
-
 use reqwest::Client;
 use serde_json::Value;
 use std::time::Duration;
@@ -72,12 +71,15 @@ async fn try_paths(c: &Client, paths: &[&str]) -> Option<reqwest::Response> {
     None
 }
 
-
 #[tokio::test]
 #[ignore]
 async fn health_returns_200_or_404() {
     let c = client();
-    let r = c.get(format!("{}/health", base_url())).send().await.unwrap();
+    let r = c
+        .get(format!("{}/health", base_url()))
+        .send()
+        .await
+        .unwrap();
     let s = r.status().as_u16();
     assert!(
         s == 200 || s == 401 || s == 404,
@@ -96,7 +98,10 @@ async fn root_serves_html() {
         .get("content-type")
         .and_then(|v| v.to_str().ok())
         .unwrap_or("");
-    assert!(ct.starts_with("text/html"), "expected text/html, got {ct:?}");
+    assert!(
+        ct.starts_with("text/html"),
+        "expected text/html, got {ct:?}"
+    );
 }
 
 #[tokio::test]
@@ -125,7 +130,10 @@ async fn manifest_parses_as_pwa() {
         .await
         .unwrap_or_else(|| panic!("no manifest path returned 2xx: {MANIFEST_CANDIDATES:?}"));
     let v: Value = r.json().await.unwrap();
-    assert!(v["name"].is_string(), "manifest.name must be a string, got {v:?}");
+    assert!(
+        v["name"].is_string(),
+        "manifest.name must be a string, got {v:?}"
+    );
     assert!(v["icons"].is_array(), "manifest.icons must be an array");
 }
 
@@ -145,7 +153,9 @@ async fn config_endpoint_has_site_title() {
     let v: Value = r.json().await.unwrap();
     assert!(v.is_object(), "expected JSON object, got {v:?}");
     assert!(
-        v.as_object().map(|o| o.contains_key("required")).unwrap_or(false),
+        v.as_object()
+            .map(|o| o.contains_key("required"))
+            .unwrap_or(false),
         "expected 'required' field, got {v:?}"
     );
 }
@@ -161,14 +171,17 @@ async fn service_worker_or_frontend_serves() {
     );
 }
 
-
 #[tokio::test]
 #[ignore]
 async fn pin_required_endpoint_does_not_5xx() {
     wait_for_health().await;
     let c = client();
     for path in ["/api/pin-required", "/api/auth/pin-required"] {
-        let r = c.get(format!("{}{}", base_url(), path)).send().await.unwrap();
+        let r = c
+            .get(format!("{}{}", base_url(), path))
+            .send()
+            .await
+            .unwrap();
         if r.status().is_success() {
             return;
         }

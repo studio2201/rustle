@@ -20,9 +20,8 @@ pub mod routes;
 pub mod utils;
 
 use axum::{
-    middleware,
+    Router, middleware,
     routing::{get, post},
-    Router,
 };
 use shared_backend::middleware::cors_layer;
 use shared_backend::server::ServerConfig;
@@ -31,13 +30,13 @@ use std::sync::Arc;
 use tower_http::services::{ServeDir, ServeFile};
 
 use auth::{
-    auth_check, auth_middleware, logout, pin_required, security_headers_middleware, verify_pin,
-    AppState,
+    AppState, auth_check, auth_middleware, logout, pin_required, security_headers_middleware,
+    verify_pin,
 };
 use routes::{serve_asset_manifest, serve_index, serve_service_worker};
 
 #[tokio::main]
-async fn main() {
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Bootstrap tracing — shared helper reads `LOG_DIR` env var and
     // configures file + stdout logging.
     let log_dir = default_log_dir();
@@ -83,13 +82,17 @@ async fn main() {
         .with_state(app_state.clone());
 
     let addr = std::net::SocketAddr::from(([0, 0, 0, 0], config.port));
-    println!("Server running natively on http://localhost:{}", config.port);
+    println!(
+        "Server running natively on http://localhost:{}",
+        config.port
+    );
 
-    let listener = tokio::net::TcpListener::bind(addr).await.unwrap();
+    let listener = tokio::net::TcpListener::bind(addr).await?;
     axum::serve(
         listener,
         app.into_make_service_with_connect_info::<std::net::SocketAddr>(),
     )
-    .await
-    .unwrap();
+    .await?;
+
+    Ok(())
 }

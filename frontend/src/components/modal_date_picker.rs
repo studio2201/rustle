@@ -39,11 +39,11 @@ pub fn date_picker_modal(props: &DatePickerModalProps) -> Html {
         Callback::from(move |_| {
             if let Some(input) = date_ref.cast::<web_sys::HtmlInputElement>() {
                 let val = input.value();
-                if !val.is_empty() {
-                    if let Ok(d) = NaiveDate::parse_from_str(&val, "%Y-%m-%d") {
-                        set_game_date(d);
-                        handle_close.emit(());
-                    }
+                if !val.is_empty()
+                    && let Ok(d) = NaiveDate::parse_from_str(&val, "%Y-%m-%d")
+                {
+                    set_game_date(d);
+                    handle_close.emit(());
                 }
             }
         })

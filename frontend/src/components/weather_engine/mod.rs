@@ -1,8 +1,9 @@
+#![allow(dead_code, deprecated)]
+
 pub mod types;
 pub use types::*;
 use wasm_bindgen::JsValue;
 use web_sys::CanvasRenderingContext2d;
-
 
 /// Spawn a new particle configured according to the active weather effect.
 ///
@@ -188,7 +189,7 @@ pub fn update_and_draw(
             p.life = 0.0;
             continue;
         }
-        
+
         // Map particle life percentage directly to canvas opacity/transparency.
         ctx.set_global_alpha((p.life / p.max_life).min(1.0) as f64);
 
@@ -226,7 +227,7 @@ pub fn update_and_draw(
             }
         }
     }
-    
+
     // Cleanup expired particles and append new splashes.
     particles.retain(|p| p.life > 0.0);
     particles.extend(splashes);

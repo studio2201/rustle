@@ -89,6 +89,17 @@ pub struct I18nContext {
     pub translations: Translations,
 }
 
+impl Default for I18nContext {
+    fn default() -> Self {
+        let language = Language::English;
+        let translations = get_translations(language);
+        Self {
+            language,
+            translations,
+        }
+    }
+}
+
 pub fn get_correct_word_message(lang: Language, solution: &str) -> String {
     match lang {
         Language::Spanish => format!("La palabra era {}", solution),

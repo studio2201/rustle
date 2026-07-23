@@ -24,10 +24,10 @@ pub mod init;
 
 use crate::app_effects::use_app_effects;
 use crate::app_state::{Action, AppState};
+use crate::components::WeatherContainer;
 use crate::components::app_modals::AppModals;
 use crate::components::grid::Grid;
 use crate::components::keyboard::Keyboard;
-use crate::components::WeatherContainer;
 use crate::constants::config::*;
 use shared_frontend::{Footer, Header};
 use yew::prelude::*;
@@ -42,10 +42,10 @@ pub fn app() -> Html {
     let is_latest_game = crate::helpers::words::get_today() == game_date;
 
     let prefers_dark = use_state(|| {
-        if let Some(win) = web_sys::window() {
-            if let Ok(Some(m)) = win.match_media("(prefers-color-scheme: dark)") {
-                return m.matches();
-            }
+        if let Some(win) = web_sys::window()
+            && let Ok(Some(m)) = win.match_media("(prefers-color-scheme: dark)")
+        {
+            return m.matches();
         }
         false
     });
@@ -81,12 +81,11 @@ pub fn app() -> Html {
         Callback::from(move |_| {
             if is_pin_required_val {
                 wasm_bindgen_futures::spawn_local(async move {
-                    if let Ok(resp) = gloo_net::http::Request::post("/api/logout").send().await {
-                        if resp.ok() {
-                            if let Some(win) = web_sys::window() {
-                                let _ = win.location().reload();
-                            }
-                        }
+                    if let Ok(resp) = gloo_net::http::Request::post("/api/logout").send().await
+                        && resp.ok()
+                        && let Some(win) = web_sys::window()
+                    {
+                        let _ = win.location().reload();
                     }
                 });
             }

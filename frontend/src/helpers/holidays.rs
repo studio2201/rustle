@@ -45,10 +45,10 @@ pub fn get_holiday_for_date(date: NaiveDate) -> Option<(&'static str, &'static s
     if let (Some(good_friday), Some(easter_monday)) = (
         easter.checked_sub_signed(Duration::days(2)),
         easter.checked_add_signed(Duration::days(1)),
-    ) {
-        if date >= good_friday && date <= easter_monday {
-            return Some(("easter", "Easter"));
-        }
+    ) && date >= good_friday
+        && date <= easter_monday
+    {
+        return Some(("easter", "Easter"));
     }
 
     // 5. Independence Day / Summer (Jul 3 - Jul 5)
@@ -63,10 +63,11 @@ pub fn get_holiday_for_date(date: NaiveDate) -> Option<(&'static str, &'static s
 
     // 7. Thanksgiving (US: 4th Thursday in Nov to Sunday)
     let thanksgiving = get_thanksgiving_thursday(year);
-    if let Some(thanksgiving_sunday) = thanksgiving.checked_add_signed(Duration::days(3)) {
-        if date >= thanksgiving && date <= thanksgiving_sunday {
-            return Some(("thanksgiving", "Thanksgiving"));
-        }
+    if let Some(thanksgiving_sunday) = thanksgiving.checked_add_signed(Duration::days(3))
+        && date >= thanksgiving
+        && date <= thanksgiving_sunday
+    {
+        return Some(("thanksgiving", "Thanksgiving"));
     }
 
     // 8. Christmas (Dec 20 - Dec 26)

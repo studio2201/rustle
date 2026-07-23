@@ -110,10 +110,10 @@ pub async fn auth_middleware(
         if constant_time_eq(header_pin.as_bytes(), expected_pin.as_bytes()) {
             is_auth = true;
         }
-    } else if let Some(cookie_token) = shared_backend::auth::read_pin_cookie(&request) {
-        if state.session_is_valid(&cookie_token) {
-            is_auth = true;
-        }
+    } else if let Some(cookie_token) = shared_backend::auth::read_pin_cookie(&request)
+        && state.session_is_valid(&cookie_token)
+    {
+        is_auth = true;
     }
 
     if is_auth {

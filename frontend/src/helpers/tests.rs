@@ -17,13 +17,13 @@
 
 use crate::helpers::encryption::{decrypt, encrypt};
 use crate::helpers::local_storage::{
-    load_game_state_from_local_storage, load_preferences_from_local_storage,
-    save_game_state_to_local_storage, save_preferences_to_local_storage, StoredGameState,
-    StoredPreferences,
+    StoredGameState, StoredPreferences, load_game_state_from_local_storage,
+    load_preferences_from_local_storage, save_game_state_to_local_storage,
+    save_preferences_to_local_storage,
 };
 use crate::helpers::share::generate_emoji_grid;
 use crate::helpers::stats::{add_stats_for_completed_game, default_stats};
-use crate::helpers::statuses::{get_guess_statuses, get_statuses, CharStatus};
+use crate::helpers::statuses::{CharStatus, get_guess_statuses, get_statuses};
 use crate::helpers::words::{
     find_first_unused_reveal, get_index, get_solution, get_word_of_day, is_winning_word,
 };

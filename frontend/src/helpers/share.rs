@@ -58,21 +58,20 @@ pub fn share_status(
     if let Some(win) = window() {
         let nav = win.navigator();
         let share_key = wasm_bindgen::JsValue::from_str("share");
-        if js_sys::Reflect::has(&nav, &share_key).unwrap_or(false) {
-            if let Ok(share_fn) = js_sys::Reflect::get(&nav, &share_key) {
-                if share_fn.is_function() {
-                    let share_data = js_sys::Object::new();
-                    let _ = js_sys::Reflect::set(
-                        &share_data,
-                        &"text".into(),
-                        &wasm_bindgen::JsValue::from_str(&text_to_share),
-                    );
+        if js_sys::Reflect::has(&nav, &share_key).unwrap_or(false)
+            && let Ok(share_fn) = js_sys::Reflect::get(&nav, &share_key)
+            && share_fn.is_function()
+        {
+            let share_data = js_sys::Object::new();
+            let _ = js_sys::Reflect::set(
+                &share_data,
+                &"text".into(),
+                &wasm_bindgen::JsValue::from_str(&text_to_share),
+            );
 
-                    let args = js_sys::Array::of1(&share_data);
-                    if js_sys::Reflect::apply(&share_fn.into(), &nav, &args).is_ok() {
-                        shared = true;
-                    }
-                }
+            let args = js_sys::Array::of1(&share_data);
+            if js_sys::Reflect::apply(&share_fn.into(), &nav, &args).is_ok() {
+                shared = true;
             }
         }
     }
