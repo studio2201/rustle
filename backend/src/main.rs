@@ -17,6 +17,7 @@
 
 pub mod auth;
 pub mod routes;
+pub mod middleware;
 pub mod utils;
 
 use axum::{
