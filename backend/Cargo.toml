@@ -22,7 +22,8 @@ path = "src/bin/sh/main.rs"
 getrandom = { version = "0.2" }
 axum = { version = "0.8", features = ["macros"] }
 tokio = { version = "1", features = ["full"] }
-tower-http = { version = "0.7", features = ["fs"] }
+tower-http = { version = "0.7", features = ["fs", "cors"\] }
+ipnet = \"2.9\"
 dotenvy = "0.15"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
